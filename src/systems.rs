@@ -67,13 +67,13 @@ pub fn update_mfkers(
         transform.translation.y += velocity.0.y * time.delta_seconds();
 
         let out_of_bounds_offset_x = 400.0 + circumradius.0;
-        let out_of_bounds_offset_y = 300.0 + circumradius.0;
         if transform.translation.x > out_of_bounds_offset_x
             || transform.translation.x < out_of_bounds_offset_x.neg()
         {
             transform.translation.x = transform.translation.x.neg();
         }
 
+        let out_of_bounds_offset_y = 300.0 + circumradius.0;
         if transform.translation.y > out_of_bounds_offset_y
             || transform.translation.y < out_of_bounds_offset_y.neg()
         {

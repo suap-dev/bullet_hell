@@ -29,7 +29,7 @@ fn main() {
     .add_systems(Startup, (setup, spawn_mfkers))
     .add_systems(Update, update_mfkers);
 
-    // #[cfg(debug_assertions)] // debug/dev builds only
+    #[cfg(debug_assertions)] // debug/dev builds only
     {
         use bevy::diagnostic::LogDiagnosticsPlugin;
         app.add_plugins(LogDiagnosticsPlugin::default());
