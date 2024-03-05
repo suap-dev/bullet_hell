@@ -2,21 +2,38 @@
 
 mod systems;
 
-use bevy::{prelude::*, window::WindowResolution};
+use bevy::{
+    app::{App, PluginGroup, Startup, Update},
+    diagnostic::FrameTimeDiagnosticsPlugin,
+    utils::default,
+    window::{Window, WindowPlugin, WindowResolution},
+    DefaultPlugins,
+};
 
 use crate::systems::{setup, spawn_mfkers, update_mfkers};
 
 fn main() {
-    App::new()
-        .add_plugins(DefaultPlugins.set(WindowPlugin {
+    let mut app = App::new();
+
+    app.add_plugins((
+        DefaultPlugins.set(WindowPlugin {
             primary_window: Some(Window {
                 resolution: WindowResolution::new(800., 600.),
                 resizable: false,
                 ..default()
             }),
             ..default()
-        }))
-        .add_systems(Startup, (setup, spawn_mfkers))
-        .add_systems(Update, update_mfkers)
-        .run();
+        }),
+        FrameTimeDiagnosticsPlugin,
+    ))
+    .add_systems(Startup, (setup, spawn_mfkers))
+    .add_systems(Update, update_mfkers);
+
+    // #[cfg(debug_assertions)] // debug/dev builds only
+    {
+        use bevy::diagnostic::LogDiagnosticsPlugin;
+        app.add_plugins(LogDiagnosticsPlugin::default());
+    }
+
+    app.run();
 }
