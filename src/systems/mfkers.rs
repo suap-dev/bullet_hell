@@ -1,33 +1,29 @@
 use std::{f32::consts::TAU, ops::Neg};
 
+const NR_OF_OBJECTS: usize = 5000;
+
 use bevy::{
-    math::vec2,
-    prelude::*,
-    sprite::{MaterialMesh2dBundle, Mesh2dHandle},
+    asset::Assets,
+    ecs::system::{Commands, Query, Res, ResMut},
+    math::{primitives::RegularPolygon, vec2, Quat},
+    render::{color::Color, mesh::Mesh},
+    sprite::{ColorMaterial, MaterialMesh2dBundle, Mesh2dHandle},
+    time::Time,
+    transform::components::Transform,
+    utils::default,
 };
 use rand::Rng;
 
-pub fn setup(mut commands: Commands) {
-    commands.spawn(Camera2dBundle::default());
-}
+use crate::components::{AngularVelocity, Circumradius, Velocity};
 
-#[derive(Component)]
-pub struct Velocity(Vec2);
-
-#[derive(Component)]
-pub struct AngularVelocity(f32);
-
-#[derive(Component)]
-pub struct Circumradius(f32);
-
-pub fn spawn_mfkers(
+pub fn spawn(
     mut commands: Commands,
     mut meshes: ResMut<Assets<Mesh>>,
     mut materials: ResMut<Assets<ColorMaterial>>,
 ) {
     let mut rng = rand::thread_rng();
 
-    for _ in 0..5000 {
+    for _ in 0..NR_OF_OBJECTS {
         let circumradius = rng.gen_range(5.0..10.0);
         let mesh = Mesh2dHandle(meshes.add(RegularPolygon::new(circumradius, rng.gen_range(3..7))));
         let material = materials.add(Color::rgb(
@@ -58,7 +54,7 @@ pub fn spawn_mfkers(
 }
 
 // apply position change and also let them go through a wall to the other side of the scene
-pub fn update_mfkers(
+pub fn update(
     time: Res<Time>,
     mut query: Query<(&mut Transform, &Velocity, &AngularVelocity, &Circumradius)>,
 ) {
