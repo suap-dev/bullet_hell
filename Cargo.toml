@@ -1,0 +1,39 @@
+[package]
+name = "bullet_hell"
+version = "0.1.0"
+edition = "2021"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[workspace]
+resolver = "2" # Important! wgpu/Bevy needs this!
+
+[dependencies]
+bevy = { version = "0.13.0", features = ["dynamic_linking"] }
+rand = "0.8.5"
+
+# Enable a small amount of optimization in debug mode
+[profile.dev]
+opt-level = 1
+
+# Enable high optimizations for dependencies (incl. Bevy), but not for our code:
+[profile.dev.package."*"]
+opt-level = 3
+
+[toolchain]
+channel = "nightly"
+
+# NOTE: For maximum performance, build using a nightly compiler
+# If you are using rust stable, remove the "-Zshare-generics=y" below.
+
+[target.x86_64-pc-windows-msvc]
+linker = "rust-lld.exe" # Use LLD Linker
+rustflags = [
+    "-Zshare-generics=n", # (Nightly)
+    "-Zthreads=0",        # (Nightly) Use improved multithreading with the recommended amount of threads.
+]
+
+# Optional: Uncommenting the following improves compile times, but reduces the amount of debug info to 'line number tables only'
+# In most cases the gains are negligible, but if you are on macos and have slow compile times you should see significant gains.
+#[profile.dev]
+#debug = 1
