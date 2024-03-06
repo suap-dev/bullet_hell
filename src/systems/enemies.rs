@@ -7,6 +7,7 @@ use bevy::{
     time::Time,
     transform::components::Transform,
     utils::default,
+    window::Window,
 };
 use rand::Rng;
 use std::{f32::consts::TAU, ops::Neg};
@@ -57,21 +58,24 @@ pub fn spawn(
 
 // apply position change and also let them go through a wall to the other side of the scene
 pub fn update(
+    window: Query<&Window>,
     time: Res<Time>,
     mut query: Query<(&mut Transform, &Velocity, &AngularVelocity, &Circumradius)>,
 ) {
+    let window = window.single();
+
     for (mut transform, velocity, angular_velocity, circumradius) in &mut query {
         transform.translation.x += velocity.0.x * time.delta_seconds();
         transform.translation.y += velocity.0.y * time.delta_seconds();
 
-        let out_of_bounds_offset_x = 400.0 + circumradius.0;
+        let out_of_bounds_offset_x = window.resolution.width() / 2.0 + circumradius.0;
         if transform.translation.x > out_of_bounds_offset_x
             || transform.translation.x < out_of_bounds_offset_x.neg()
         {
             transform.translation.x = transform.translation.x.neg();
         }
 
-        let out_of_bounds_offset_y = 300.0 + circumradius.0;
+        let out_of_bounds_offset_y = window.resolution.height() / 2.0 + circumradius.0;
         if transform.translation.y > out_of_bounds_offset_y
             || transform.translation.y < out_of_bounds_offset_y.neg()
         {
