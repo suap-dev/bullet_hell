@@ -17,3 +17,6 @@ pub struct Player;
 
 #[derive(Component)]
 pub struct Enemy;
+
+#[derive(Component)]
+pub struct LineOfSightRange(pub f32);
