@@ -1,11 +1,7 @@
-use std::{f32::consts::TAU, ops::Neg};
-
-const NR_OF_OBJECTS: usize = 5000;
-
 use bevy::{
     asset::Assets,
     ecs::system::{Commands, Query, Res, ResMut},
-    math::{primitives::RegularPolygon, vec2, Quat},
+    math::{primitives::RegularPolygon, Quat},
     render::{color::Color, mesh::Mesh},
     sprite::{ColorMaterial, MaterialMesh2dBundle, Mesh2dHandle},
     time::Time,
@@ -13,8 +9,14 @@ use bevy::{
     utils::default,
 };
 use rand::Rng;
+use std::{f32::consts::TAU, ops::Neg};
 
-use crate::components::{AngularVelocity, Circumradius, Velocity};
+use crate::{
+    bundles::EnemyBundle,
+    components::{AngularVelocity, Circumradius, Velocity},
+};
+
+const NR_OF_OBJECTS: usize = 100;
 
 pub fn spawn(
     mut commands: Commands,
@@ -24,8 +26,9 @@ pub fn spawn(
     let mut rng = rand::thread_rng();
 
     for _ in 0..NR_OF_OBJECTS {
-        let circumradius = rng.gen_range(5.0..10.0);
-        let mesh = Mesh2dHandle(meshes.add(RegularPolygon::new(circumradius, rng.gen_range(3..7))));
+        let circumradius = Circumradius(rng.gen_range(5.0..10.0));
+        let mesh =
+            Mesh2dHandle(meshes.add(RegularPolygon::new(circumradius.0, rng.gen_range(3..7))));
         let material = materials.add(Color::rgb(
             rng.gen_range(0.2..0.8),
             rng.gen_range(0.0..0.2),
@@ -38,18 +41,17 @@ pub fn spawn(
         )
         .with_rotation(Quat::from_rotation_z(rng.gen_range(0.0..TAU)));
 
-        let mfker = MaterialMesh2dBundle {
+        let material_mesh_bundle = MaterialMesh2dBundle {
             mesh,
             material,
             transform,
             ..default()
         };
 
-        commands.spawn(mfker).insert((
-            Velocity(vec2(rng.gen_range(-20.0..20.0), rng.gen_range(-20.0..20.0))),
-            AngularVelocity(rng.gen_range(-2.0..2.0)),
-            Circumradius(circumradius),
-        ));
+        commands.spawn(EnemyBundle {
+            material_mesh_bundle,
+            ..default()
+        });
     }
 }
 

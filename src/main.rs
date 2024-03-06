@@ -1,5 +1,4 @@
-#![warn(clippy::all, clippy::pedantic, clippy::nursery)]
-
+mod bundles;
 mod components;
 mod systems;
 
@@ -11,7 +10,7 @@ use bevy::{
     DefaultPlugins,
 };
 
-use crate::systems::{mfkers, setup};
+use crate::systems::{camera, enemies, player};
 
 fn main() {
     let mut app = App::new();
@@ -27,8 +26,8 @@ fn main() {
         }),
         FrameTimeDiagnosticsPlugin,
     ))
-    .add_systems(Startup, (setup::camera, mfkers::spawn))
-    .add_systems(Update, mfkers::update);
+    .add_systems(Startup, (camera::setup, enemies::spawn, player::spawn))
+    .add_systems(Update, enemies::update);
 
     // #[cfg(debug_assertions)] // debug/dev builds only
     {

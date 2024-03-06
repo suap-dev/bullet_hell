@@ -3,6 +3,12 @@ name = "bullet_hell"
 version = "0.1.0"
 edition = "2021"
 
+[lints.clippy]
+all = "warn"
+pedantic = "warn"
+nursery = "warn"
+needless_pass_by_value = "allow"
+
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [workspace]
