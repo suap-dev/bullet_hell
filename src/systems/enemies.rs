@@ -1,10 +1,11 @@
 use bevy::{
     asset::Assets,
     ecs::{
+        // entity::Entity,
         query::{With, Without},
         system::{Commands, Query, Res, ResMut},
     },
-    math::{primitives::RegularPolygon, Quat, Vec3Swizzles},
+    math::{primitives::RegularPolygon, Quat},
     render::{color::Color, mesh::Mesh},
     sprite::{ColorMaterial, MaterialMesh2dBundle, Mesh2dHandle},
     time::Time,
@@ -66,10 +67,11 @@ pub fn update(
     time: Res<Time>,
     mut query: Query<
         (
+            // Entity,
             &mut Transform,
             &LineOfSightRange,
             &Velocity,
-            &AngularVelocity,
+            &mut AngularVelocity,
             &Circumradius,
         ),
         (With<Enemy>, Without<Player>),
@@ -79,37 +81,56 @@ pub fn update(
     let window = window.single();
     let player_transform = player_transform.single();
 
-    for (mut transform, los_range, velocity, angular_velocity, circumradius) in &mut query {
+    // let mut closest: (Entity, f32) = (Entity::from_raw(0), f32::MAX);
+
+    // todo: rewrite it so it uses transform arithmetics and uses angulare velocity in a cooler way
+    for (/*entity,*/ mut transform, los_range, velocity, angular_velocity, circumradius) in
+        &mut query
+    {
+        let dist_squared = transform
+            .translation
+            .distance_squared(player_transform.translation);
+
+        // if dist_squared < closest.1 {
+        //     closest = (entity, dist_squared);
+        // }
+
         let velocity = {
-            let towards_player = player_transform.translation - transform.translation;
-            if towards_player.length() < los_range.0 {
-                (towards_player.normalize() * velocity.0.length()).xy()
+            if dist_squared < los_range.0.powi(2) {
+                (player_transform.translation - transform.translation).normalize()
+                    * velocity.0.length()
             } else {
                 velocity.0
             }
         };
 
-        let angular_velocity = angular_velocity.0;
+        transform.translation.x = {
+            let x = velocity
+                .x
+                .mul_add(time.delta_seconds(), transform.translation.x);
+            let out_of_bounds_offset = window.resolution.width() / 2.0 + circumradius.0;
+            if x > out_of_bounds_offset || x < out_of_bounds_offset.neg() {
+                x.neg()
+            } else {
+                x
+            }
+        };
 
-        transform.translation.x += velocity.x * time.delta_seconds();
-        transform.translation.y += velocity.y * time.delta_seconds();
-
-        let out_of_bounds_offset_x = window.resolution.width() / 2.0 + circumradius.0;
-        if transform.translation.x > out_of_bounds_offset_x
-            || transform.translation.x < out_of_bounds_offset_x.neg()
-        {
-            transform.translation.x = transform.translation.x.neg();
-        }
-
-        let out_of_bounds_offset_y = window.resolution.height() / 2.0 + circumradius.0;
-        if transform.translation.y > out_of_bounds_offset_y
-            || transform.translation.y < out_of_bounds_offset_y.neg()
-        {
-            transform.translation.y = transform.translation.y.neg();
-        }
+        // todo: DRY
+        transform.translation.y = {
+            let y = velocity
+                .y
+                .mul_add(time.delta_seconds(), transform.translation.y);
+            let out_of_bounds_offset = window.resolution.height() / 2.0 + circumradius.0;
+            if y > out_of_bounds_offset || y < out_of_bounds_offset.neg() {
+                y.neg()
+            } else {
+                y
+            }
+        };
 
         transform.rotate(Quat::from_rotation_z(
-            angular_velocity * time.delta_seconds(),
+            angular_velocity.0 * time.delta_seconds(),
         ));
     }
 }

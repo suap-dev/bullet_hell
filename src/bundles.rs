@@ -1,6 +1,6 @@
 use bevy::{
     ecs::bundle::Bundle,
-    math::vec2,
+    math::vec3,
     sprite::{ColorMaterial, MaterialMesh2dBundle},
 };
 use rand::Rng;
@@ -24,7 +24,11 @@ impl Default for EnemyBundle {
             material_mesh_bundle: MaterialMesh2dBundle::default(),
             circumradius: Circumradius(rng.gen_range(5.0..10.0)),
             los_range: LineOfSightRange(rng.gen_range(100.0..300.0)),
-            velocity: Velocity(vec2(rng.gen_range(-20.0..20.0), rng.gen_range(-20.0..20.0))),
+            velocity: Velocity(vec3(
+                rng.gen_range(-20.0..20.0),
+                rng.gen_range(-20.0..20.0),
+                0.0,
+            )),
             angular_velocity: AngularVelocity(rng.gen_range(-2.0..2.0)),
         }
     }
