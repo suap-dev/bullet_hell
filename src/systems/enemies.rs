@@ -5,7 +5,7 @@ use bevy::{
         query::{With, Without},
         system::{Commands, Query, Res, ResMut},
     },
-    math::{primitives::RegularPolygon, Quat},
+    math::{primitives::RegularPolygon, Quat, Vec3},
     render::{color::Color, mesh::Mesh},
     sprite::{ColorMaterial, MaterialMesh2dBundle, Mesh2dHandle},
     time::Time,
@@ -60,7 +60,6 @@ pub fn spawn(
     }
 }
 
-// apply position change and also let them go through a wall to the other side of the scene
 #[allow(clippy::type_complexity)]
 pub fn update(
     window: Query<&Window>,
@@ -83,7 +82,7 @@ pub fn update(
 
     // let mut closest: (Entity, f32) = (Entity::from_raw(0), f32::MAX);
 
-    // todo: rewrite it so it uses transform arithmetics and uses angulare velocity in a cooler way
+    // TODO: rewrite it so it uses transform arithmetics and uses angular velocity in a cooler way
     for (/*entity,*/ mut transform, los_range, velocity, angular_velocity, circumradius) in
         &mut query
     {
@@ -104,33 +103,61 @@ pub fn update(
             }
         };
 
-        transform.translation.x = {
-            let x = velocity
-                .x
-                .mul_add(time.delta_seconds(), transform.translation.x);
-            let out_of_bounds_offset = window.resolution.width() / 2.0 + circumradius.0;
-            if x > out_of_bounds_offset || x < out_of_bounds_offset.neg() {
-                x.neg()
-            } else {
-                x
-            }
-        };
-
-        // todo: DRY
-        transform.translation.y = {
-            let y = velocity
-                .y
-                .mul_add(time.delta_seconds(), transform.translation.y);
-            let out_of_bounds_offset = window.resolution.height() / 2.0 + circumradius.0;
-            if y > out_of_bounds_offset || y < out_of_bounds_offset.neg() {
-                y.neg()
-            } else {
-                y
-            }
-        };
+        // TODO: right_bound and top_bound - could they be a resource?
+        let right_bound = window.resolution.width() / 2.0 + circumradius.0;
+        let top_bound = window.resolution.height() / 2.0 + circumradius.0;
+        update_translation(
+            &mut transform.translation,
+            velocity,
+            time.delta_seconds(),
+            right_bound.neg(),
+            right_bound,
+            top_bound.neg(),
+            top_bound,
+        );
 
         transform.rotate(Quat::from_rotation_z(
             angular_velocity.0 * time.delta_seconds(),
         ));
+    }
+}
+
+fn update_translation(
+    coords: &mut Vec3,
+    velocity: Vec3,
+    delta_seconds: f32,
+    left_bound: f32,
+    right_bound: f32,
+    bottom_bound: f32,
+    top_bound: f32,
+) {
+    update_single_coord(
+        &mut coords.x,
+        velocity.x,
+        delta_seconds,
+        left_bound,
+        right_bound,
+    );
+
+    update_single_coord(
+        &mut coords.y,
+        velocity.y,
+        delta_seconds,
+        bottom_bound,
+        top_bound,
+    );
+}
+
+fn update_single_coord(
+    positional_coord: &mut f32,
+    velocity_coord: f32,
+    delta_seconds: f32,
+    left_bound: f32,
+    right_bound: f32,
+) {
+    *positional_coord = velocity_coord.mul_add(delta_seconds, *positional_coord);
+
+    if *positional_coord < left_bound || right_bound < *positional_coord {
+        *positional_coord = positional_coord.neg();
     }
 }
