@@ -1,14 +1,6 @@
-use bevy::{
-    asset::Assets,
-    ecs::system::{Commands, ResMut},
-    math::primitives::Circle,
-    render::{color::Color, mesh::Mesh},
-    sprite::{ColorMaterial, MaterialMesh2dBundle, Mesh2dHandle},
-    transform::components::Transform,
-    utils::default,
-};
+use bevy::{prelude::*, sprite};
 
-use crate::{bundles::PlayerBundle, components::attributes};
+use crate::{bundles, components::attributes};
 
 pub fn spawn(
     mut commands: Commands,
@@ -16,18 +8,18 @@ pub fn spawn(
     mut materials: ResMut<Assets<ColorMaterial>>,
 ) {
     let circumradius = attributes::Circumradius(10.0);
-    let mesh = Mesh2dHandle(meshes.add(Circle::new(circumradius.0)));
+    let mesh = sprite::Mesh2dHandle(meshes.add(Circle::new(circumradius.0)));
     let material = materials.add(Color::rgb(0.8, 0.8, 0.8));
     let transform = Transform::from_xyz(0.0, 0.0, -2.0);
 
-    let material_mesh_bundle = MaterialMesh2dBundle {
+    let material_mesh_bundle = sprite::MaterialMesh2dBundle {
         mesh,
         material,
         transform,
         ..default()
     };
 
-    commands.spawn(PlayerBundle {
+    commands.spawn(bundles::Player {
         material_mesh_bundle,
         circumradius,
         ..default()

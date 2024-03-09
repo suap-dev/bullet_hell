@@ -1,21 +1,18 @@
-use bevy::{
-    ecs::bundle::Bundle,
-    sprite::{ColorMaterial, MaterialMesh2dBundle},
-};
+use bevy::{ecs::bundle::Bundle, sprite};
 
 use crate::components::{attributes, markers};
 
 #[derive(Bundle)]
-pub struct PlayerBundle {
+pub struct Player {
     pub marker: markers::Player,
-    pub material_mesh_bundle: MaterialMesh2dBundle<ColorMaterial>,
+    pub material_mesh_bundle: sprite::MaterialMesh2dBundle<sprite::ColorMaterial>,
     pub circumradius: attributes::Circumradius,
 }
-impl Default for PlayerBundle {
+impl Default for Player {
     fn default() -> Self {
         Self {
             marker: markers::Player,
-            material_mesh_bundle: MaterialMesh2dBundle::default(),
+            material_mesh_bundle: sprite::MaterialMesh2dBundle::default(),
             circumradius: attributes::Circumradius(-1.0),
         }
     }
