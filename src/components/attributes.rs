@@ -1,13 +1,5 @@
 use bevy::{ecs::component::Component, math::Vec3};
 
-// Markers:
-#[derive(Component)]
-pub struct Player;
-
-#[derive(Component)]
-pub struct Enemy;
-
-// Stats:
 #[derive(Component)]
 pub struct Velocity(pub Vec3);
 
@@ -22,3 +14,9 @@ pub struct HitPoints(pub f32);
 
 #[derive(Component)]
 pub struct LineOfSightRange(pub f32);
+
+#[derive(Component)]
+pub struct Range(pub f32);
+
+#[derive(Component)]
+pub struct LifeSpan(pub f32);

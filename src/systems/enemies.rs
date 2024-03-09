@@ -18,7 +18,7 @@ use std::{f32::consts::TAU, ops::Neg};
 
 use crate::{
     bundles::EnemyBundle,
-    components::{AngularVelocity, Circumradius, Enemy, LineOfSightRange, Player, Velocity},
+    components::{attributes, markers},
 };
 
 const NR_OF_OBJECTS: usize = 200;
@@ -31,7 +31,7 @@ pub fn spawn(
     let mut rng = rand::thread_rng();
 
     for _ in 0..NR_OF_OBJECTS {
-        let circumradius = Circumradius(rng.gen_range(5.0..10.0));
+        let circumradius = attributes::Circumradius(rng.gen_range(5.0..10.0));
         let mesh =
             Mesh2dHandle(meshes.add(RegularPolygon::new(circumradius.0, rng.gen_range(3..6))));
         let material = materials.add(Color::rgb(
@@ -68,17 +68,23 @@ pub fn update(
         (
             // Entity,
             &mut Transform,
-            &LineOfSightRange,
-            &Velocity,
-            &mut AngularVelocity,
-            &Circumradius,
+            &attributes::LineOfSightRange,
+            &attributes::Velocity,
+            &mut attributes::AngularVelocity,
+            &attributes::Circumradius,
         ),
-        (With<Enemy>, Without<Player>),
+        (With<markers::Enemy>, Without<markers::Player>),
     >,
-    player_transform: Query<&Transform, (With<Player>, Without<Enemy>)>,
+    player_transform: Query<&Transform, (With<markers::Player>, Without<markers::Enemy>)>,
 ) {
     let window = window.single();
     let player_transform = player_transform.single();
+
+    // TODO: right_bound and top_bound - could they be a resource?
+    let right_border = window.resolution.width() / 2.0;
+    let left_border = right_border.neg();
+    let top_border = window.resolution.height() / 2.0;
+    let bottom_border = top_border.neg();
 
     // let mut closest: (Entity, f32) = (Entity::from_raw(0), f32::MAX);
 
@@ -86,14 +92,13 @@ pub fn update(
     for (/*entity,*/ mut transform, los_range, velocity, angular_velocity, circumradius) in
         &mut query
     {
-        let dist_squared = transform
-            .translation
-            .distance_squared(player_transform.translation);
-
         // if dist_squared < closest.1 {
         //     closest = (entity, dist_squared);
         // }
 
+        let dist_squared = transform
+            .translation
+            .distance_squared(player_transform.translation);
         let velocity = {
             if dist_squared < los_range.0.powi(2) {
                 (player_transform.translation - transform.translation).normalize()
@@ -103,61 +108,47 @@ pub fn update(
             }
         };
 
-        // TODO: right_bound and top_bound - could they be a resource?
-        let right_bound = window.resolution.width() / 2.0 + circumradius.0;
-        let top_bound = window.resolution.height() / 2.0 + circumradius.0;
-        update_translation(
+        apply_velocity(&mut transform.translation, velocity, time.delta_seconds());
+        teleport_if_out_of_bounds(
             &mut transform.translation,
-            velocity,
-            time.delta_seconds(),
-            right_bound.neg(),
-            right_bound,
-            top_bound.neg(),
-            top_bound,
+            circumradius.0,
+            left_border,
+            right_border,
+            bottom_border,
+            top_border,
         );
-
         transform.rotate(Quat::from_rotation_z(
             angular_velocity.0 * time.delta_seconds(),
         ));
     }
 }
 
-fn update_translation(
-    coords: &mut Vec3,
-    velocity: Vec3,
-    delta_seconds: f32,
-    left_bound: f32,
-    right_bound: f32,
-    bottom_bound: f32,
-    top_bound: f32,
-) {
-    update_single_coord(
-        &mut coords.x,
-        velocity.x,
-        delta_seconds,
-        left_bound,
-        right_bound,
-    );
+fn apply_velocity(translation: &mut Vec3, velocity: Vec3, delta_seconds: f32) {
+    *translation += velocity * delta_seconds;
+}
 
-    update_single_coord(
-        &mut coords.y,
-        velocity.y,
-        delta_seconds,
-        bottom_bound,
-        top_bound,
+fn teleport_if_out_of_bounds(
+    translation: &mut Vec3,
+    circumradius: f32,
+    left_border: f32,
+    right_border: f32,
+    bottom_border: f32,
+    top_border: f32,
+) {
+    fix_coordinate_cycle(
+        &mut translation.x,
+        left_border - circumradius,
+        right_border + circumradius,
+    );
+    fix_coordinate_cycle(
+        &mut translation.y,
+        bottom_border - circumradius,
+        top_border + circumradius,
     );
 }
 
-fn update_single_coord(
-    positional_coord: &mut f32,
-    velocity_coord: f32,
-    delta_seconds: f32,
-    left_bound: f32,
-    right_bound: f32,
-) {
-    *positional_coord = velocity_coord.mul_add(delta_seconds, *positional_coord);
-
-    if *positional_coord < left_bound || right_bound < *positional_coord {
-        *positional_coord = positional_coord.neg();
+fn fix_coordinate_cycle(coord: &mut f32, lower_bound: f32, upper_bound: f32) {
+    if *coord < lower_bound || upper_bound < *coord {
+        *coord = coord.neg();
     }
 }
