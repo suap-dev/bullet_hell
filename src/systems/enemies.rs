@@ -1,23 +1,9 @@
-use bevy::{
-    asset::Assets,
-    ecs::{
-        // entity::Entity,
-        query::{With, Without},
-        system::{Commands, Query, Res, ResMut},
-    },
-    math::{primitives::RegularPolygon, Quat, Vec3},
-    render::{color::Color, mesh::Mesh},
-    sprite::{ColorMaterial, MaterialMesh2dBundle, Mesh2dHandle},
-    time::Time,
-    transform::components::Transform,
-    utils::default,
-    window::Window,
-};
+use bevy::{prelude::*, sprite};
 use rand::Rng;
 use std::{f32::consts::TAU, ops::Neg};
 
 use crate::{
-    bundles::EnemyBundle,
+    bundles,
     components::{attributes, markers},
 };
 
@@ -32,8 +18,9 @@ pub fn spawn(
 
     for _ in 0..NR_OF_OBJECTS {
         let circumradius = attributes::Circumradius(rng.gen_range(5.0..10.0));
-        let mesh =
-            Mesh2dHandle(meshes.add(RegularPolygon::new(circumradius.0, rng.gen_range(3..6))));
+        let mesh = sprite::Mesh2dHandle(
+            meshes.add(RegularPolygon::new(circumradius.0, rng.gen_range(3..6))),
+        );
         let material = materials.add(Color::rgb(
             rng.gen_range(0.2..0.8),
             rng.gen_range(0.0..0.2),
@@ -46,14 +33,14 @@ pub fn spawn(
         )
         .with_rotation(Quat::from_rotation_z(rng.gen_range(0.0..TAU)));
 
-        let material_mesh_bundle = MaterialMesh2dBundle {
+        let material_mesh_bundle = sprite::MaterialMesh2dBundle {
             mesh,
             material,
             transform,
             ..default()
         };
 
-        commands.spawn(EnemyBundle {
+        commands.spawn(bundles::Enemy {
             material_mesh_bundle,
             ..default()
         });
@@ -77,14 +64,22 @@ pub fn update(
     >,
     player_transform: Query<&Transform, (With<markers::Player>, Without<markers::Enemy>)>,
 ) {
-    let window = window.single();
-    let player_transform = player_transform.single();
+    let player_position = player_transform.single().translation;
 
-    // TODO: right_bound and top_bound - could they be a resource?
-    let right_border = window.resolution.width() / 2.0;
-    let left_border = right_border.neg();
-    let top_border = window.resolution.height() / 2.0;
-    let bottom_border = top_border.neg();
+    // TODO: borders - could they be a resource?
+    let (right_border, left_border, top_border, bottom_border) = {
+        let resolution = &window.single().resolution;
+
+        let right_border = resolution.width() / 2.0;
+        let top_border = resolution.height() / 2.0;
+
+        (
+            right_border,
+            right_border.neg(),
+            top_border,
+            top_border.neg(),
+        )
+    };
 
     // let mut closest: (Entity, f32) = (Entity::from_raw(0), f32::MAX);
 
@@ -96,19 +91,21 @@ pub fn update(
         //     closest = (entity, dist_squared);
         // }
 
-        let dist_squared = transform
-            .translation
-            .distance_squared(player_transform.translation);
+        let position = transform.translation;
+        let dist_squared = position.distance_squared(player_position);
         let velocity = {
             if dist_squared < los_range.0.powi(2) {
-                (player_transform.translation - transform.translation).normalize()
-                    * velocity.0.length()
+                (player_position - position).xy().clamp_length(0.0, 1.0) * velocity.0.length()
             } else {
                 velocity.0
             }
         };
 
-        apply_velocity(&mut transform.translation, velocity, time.delta_seconds());
+        apply_velocity(
+            &mut transform.translation,
+            velocity.extend(0.0),
+            time.delta_seconds(),
+        );
         teleport_if_out_of_bounds(
             &mut transform.translation,
             circumradius.0,
