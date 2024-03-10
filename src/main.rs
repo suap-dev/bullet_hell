@@ -35,7 +35,7 @@ fn main() {
     }))
     .add_systems(Startup, camera::setup)
     .add_systems(Startup, player::spawn)
-    .add_systems(Startup, enemies::spawn)
-    .add_systems(Update, enemies::update)
+    // .add_systems(Startup, enemies::spawn)
+    // .add_systems(Update, enemies::update)
     .run();
 }

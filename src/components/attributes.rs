@@ -1,6 +1,12 @@
 use bevy::{ecs::component::Component, math::Vec2};
 
 #[derive(Component)]
+pub struct Movement {
+    pub direction: Vec2,
+    pub speed: f32,
+}
+
+#[derive(Component)]
 pub struct Velocity(pub Vec2);
 
 #[derive(Component)]

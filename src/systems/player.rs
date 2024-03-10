@@ -1,6 +1,9 @@
 use bevy::{prelude::*, sprite};
 
-use crate::{bundles, components::attributes};
+use crate::{
+    bundles,
+    components::{attributes, markers},
+};
 
 pub fn spawn(
     mut commands: Commands,
@@ -24,4 +27,10 @@ pub fn spawn(
         circumradius,
         ..default()
     });
+}
+
+pub fn movement_input(
+    mut player: Query<&mut attributes::Movement, (With<markers::Player>, Without<markers::Enemy>)>,
+) {
+    player.single_mut();
 }
