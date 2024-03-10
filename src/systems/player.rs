@@ -31,27 +31,30 @@ pub fn spawn(
 
 pub fn movement_input(
     mut player: Query<&mut attributes::Movement, (With<markers::Player>, Without<markers::Enemy>)>,
-    keyboard_input: Res<ButtonInput<KeyCode>>,
+    keyboard_input: Res<ButtonInput<(KeyCode)>>,
 ) {
     let mut player_movement = player.single_mut();
     player_movement.direction = Vec2::ZERO;
 
-    if keyboard_input.pressed(KeyCode::ArrowRight) {
+    let input_action_up =
+        keyboard_input.pressed(KeyCode::ArrowUp) || keyboard_input.pressed(KeyCode::KeyW);
+    let input_action_down =
+        keyboard_input.pressed(KeyCode::ArrowDown) || keyboard_input.pressed(KeyCode::KeyS);
+    let input_action_left =
+        keyboard_input.pressed(KeyCode::ArrowLeft) || keyboard_input.pressed(KeyCode::KeyA);
+    let input_action_right =
+        keyboard_input.pressed(KeyCode::ArrowRight) || keyboard_input.pressed(KeyCode::KeyD);
+
+    if input_action_right {
         player_movement.direction.x += 1.0;
     }
-    if keyboard_input.pressed(KeyCode::ArrowLeft) {
+    if input_action_left {
         player_movement.direction.x -= 1.0;
     }
-    if keyboard_input.pressed(KeyCode::ArrowUp) {
+    if input_action_up {
         player_movement.direction.y += 1.0;
     }
-    if keyboard_input.pressed(KeyCode::ArrowDown) {
+    if input_action_down {
         player_movement.direction.y -= 1.0;
-    }
-}
-
-pub fn apply_velocity(time: Res<Time>, mut query: Query<(&mut Transform, &attributes::Movement)>) {
-    for (mut transform, movement) in &mut query {
-        transform.translation += (movement.velocity() * time.delta_seconds()).extend(0.0);
     }
 }

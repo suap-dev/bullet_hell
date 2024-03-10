@@ -7,7 +7,7 @@ use bevy::{
     window::{EnabledButtons, WindowResolution},
 };
 
-use crate::systems::{camera, enemies, player};
+use crate::systems::*;
 
 const LOGICAL_WIDTH: f32 = 800.0;
 const LOGICAL_HEIGHT: f32 = 600.0;
@@ -35,8 +35,9 @@ fn main() {
     }))
     .add_systems(Startup, camera::setup)
     .add_systems(Startup, player::spawn)
-    .add_systems(Update, (player::movement_input, player::apply_velocity))
+    .add_systems(Update, player::movement_input)
     .add_systems(Startup, enemies::spawn)
     .add_systems(Update, enemies::update)
+    .add_systems(Update, transform::apply_velocity)
     .run();
 }
