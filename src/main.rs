@@ -7,6 +7,7 @@ use bevy::{
     window::{EnabledButtons, WindowResolution},
 };
 
+#[allow(clippy::wildcard_imports)]
 use crate::systems::*;
 
 const LOGICAL_WIDTH: f32 = 800.0;

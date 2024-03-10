@@ -36,25 +36,26 @@ pub fn movement_input(
     let mut player_movement = player.single_mut();
     player_movement.direction = Vec2::ZERO;
 
-    let input_action_up =
+    let action_up =
         keyboard_input.pressed(KeyCode::ArrowUp) || keyboard_input.pressed(KeyCode::KeyW);
-    let input_action_down =
+    let action_down =
         keyboard_input.pressed(KeyCode::ArrowDown) || keyboard_input.pressed(KeyCode::KeyS);
-    let input_action_left =
+    let action_left =
         keyboard_input.pressed(KeyCode::ArrowLeft) || keyboard_input.pressed(KeyCode::KeyA);
-    let input_action_right =
+    let action_right =
         keyboard_input.pressed(KeyCode::ArrowRight) || keyboard_input.pressed(KeyCode::KeyD);
 
-    if input_action_right {
+    if action_right {
         player_movement.direction.x += 1.0;
     }
-    if input_action_left {
+    if action_left {
         player_movement.direction.x -= 1.0;
     }
-    if input_action_up {
+    if action_up {
         player_movement.direction.y += 1.0;
     }
-    if input_action_down {
+    if action_down {
         player_movement.direction.y -= 1.0;
     }
 }
+
