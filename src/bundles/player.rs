@@ -17,7 +17,7 @@ impl Default for Player {
             circumradius: attributes::Circumradius(-1.0),
             movement: attributes::Movement {
                 direction: Vec2::ZERO,
-                speed: 50.0,
+                speed: 80.0,
             },
         }
     }

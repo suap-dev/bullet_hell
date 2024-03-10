@@ -31,6 +31,27 @@ pub fn spawn(
 
 pub fn movement_input(
     mut player: Query<&mut attributes::Movement, (With<markers::Player>, Without<markers::Enemy>)>,
+    keyboard_input: Res<ButtonInput<KeyCode>>,
 ) {
-    player.single_mut();
+    let mut player_movement = player.single_mut();
+    player_movement.direction = Vec2::ZERO;
+
+    if keyboard_input.pressed(KeyCode::ArrowRight) {
+        player_movement.direction.x += 1.0;
+    }
+    if keyboard_input.pressed(KeyCode::ArrowLeft) {
+        player_movement.direction.x -= 1.0;
+    }
+    if keyboard_input.pressed(KeyCode::ArrowUp) {
+        player_movement.direction.y += 1.0;
+    }
+    if keyboard_input.pressed(KeyCode::ArrowDown) {
+        player_movement.direction.y -= 1.0;
+    }
+}
+
+pub fn apply_velocity(time: Res<Time>, mut query: Query<(&mut Transform, &attributes::Movement)>) {
+    for (mut transform, movement) in &mut query {
+        transform.translation += (movement.velocity() * time.delta_seconds()).extend(0.0);
+    }
 }
