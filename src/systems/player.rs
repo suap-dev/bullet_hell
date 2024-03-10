@@ -31,7 +31,7 @@ pub fn spawn(
 
 pub fn movement_input(
     mut player: Query<&mut attributes::Movement, (With<markers::Player>, Without<markers::Enemy>)>,
-    keyboard_input: Res<ButtonInput<(KeyCode)>>,
+    keyboard_input: Res<ButtonInput<KeyCode>>,
 ) {
     let mut player_movement = player.single_mut();
     player_movement.direction = Vec2::ZERO;
@@ -58,4 +58,3 @@ pub fn movement_input(
         player_movement.direction.y -= 1.0;
     }
 }
-
