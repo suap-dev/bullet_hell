@@ -8,14 +8,20 @@ use crate::{
 pub fn spawn(
     mut commands: Commands,
     mut meshes: ResMut<Assets<Mesh>>,
-    mut materials: ResMut<Assets<ColorMaterial>>,
+    mut materials: ResMut<Assets<StandardMaterial>>,
 ) {
     let circumradius = attributes::Circumradius(6.0);
-    let mesh = sprite::Mesh2dHandle(meshes.add(Circle::new(circumradius.0)));
-    let material = materials.add(Color::rgb(0.0, 0.8, 0.6));
+    // let mesh = sprite::Mesh2dHandle(meshes.add(Circle::new(circumradius.0)));
+    // let material = materials.add(Color::rgb(0.0, 0.8, 0.6));
     let transform = Transform::from_xyz(0.0, 0.0, -2.0);
 
-    let material_mesh_bundle = sprite::MaterialMesh2dBundle {
+    let mesh = meshes.add(Sphere::new(circumradius.0).mesh().uv(32, 18));
+    let material = materials.add(StandardMaterial {
+        base_color: Color::rgb(0.0, 0.8, 0.6),
+        ..default()
+    });
+
+    let material_mesh_bundle = PbrBundle {
         mesh,
         material,
         transform,
@@ -26,6 +32,11 @@ pub fn spawn(
         material_mesh_bundle,
         circumradius,
         ..default()
+    });
+
+    commands.insert_resource(AmbientLight {
+        color: Color::ORANGE_RED,
+        brightness: 0.02,
     });
 }
 
