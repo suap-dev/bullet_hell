@@ -95,7 +95,7 @@ pub fn update(
         let position = transform.translation;
         let dist_squared = position.distance_squared(player_position);
         if dist_squared < los_range.0.powi(2) {
-            movement.direction = (player_position - transform.translation).xy();
+            movement.set_direction((player_position - transform.translation).xy());
         }
 
         // TODO: make it a separate system, more generic, that could also update player and possibly let you chose the offset of out of bounds calculation

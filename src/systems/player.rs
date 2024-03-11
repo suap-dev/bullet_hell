@@ -33,9 +33,9 @@ pub fn movement_input(
     mut player: Query<&mut attributes::Movement, (With<markers::Player>, Without<markers::Enemy>)>,
     keyboard_input: Res<ButtonInput<KeyCode>>,
 ) {
-    let mut player_movement = player.single_mut();
-    player_movement.direction = Vec2::ZERO;
+    let mut direction = Vec2::ZERO;
 
+    // TODO: separate module for input mappings?
     let action_up =
         keyboard_input.pressed(KeyCode::ArrowUp) || keyboard_input.pressed(KeyCode::KeyW);
     let action_down =
@@ -46,15 +46,17 @@ pub fn movement_input(
         keyboard_input.pressed(KeyCode::ArrowRight) || keyboard_input.pressed(KeyCode::KeyD);
 
     if action_right {
-        player_movement.direction.x += 1.0;
+        direction.x += 1.0;
     }
     if action_left {
-        player_movement.direction.x -= 1.0;
+        direction.x -= 1.0;
     }
     if action_up {
-        player_movement.direction.y += 1.0;
+        direction.y += 1.0;
     }
     if action_down {
-        player_movement.direction.y -= 1.0;
+        direction.y -= 1.0;
     }
+
+    player.single_mut().set_direction(direction);
 }

@@ -15,10 +15,7 @@ impl Default for Player {
             marker: markers::Player,
             material_mesh_bundle: sprite::MaterialMesh2dBundle::default(),
             circumradius: attributes::Circumradius(-1.0),
-            movement: attributes::Movement {
-                direction: Vec2::ZERO,
-                speed: 80.0,
-            },
+            movement: attributes::Movement::from_max_speed(80.0),
         }
     }
 }

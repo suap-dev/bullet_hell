@@ -19,10 +19,10 @@ impl Default for Enemy {
             marker: markers::Enemy,
             material_mesh_bundle: sprite::MaterialMesh2dBundle::default(),
             circumradius: attributes::Circumradius(rng.gen_range(5.0..10.0)),
-            movement: attributes::Movement {
-                direction: vec2(rng.gen_range(-20.0..20.0), rng.gen_range(-20.0..20.0)),
-                speed: rng.gen_range(10.0..30.0),
-            },
+            movement: attributes::Movement::from_velocity(vec2(
+                rng.gen_range(-20.0..20.0),
+                rng.gen_range(-20.0..20.0),
+            )),
             los_range: attributes::LineOfSightRange(rng.gen_range(100.0..300.0)),
             angular_velocity: attributes::AngularVelocity(rng.gen_range(-2.0..2.0)),
         }

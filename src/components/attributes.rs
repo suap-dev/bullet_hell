@@ -3,16 +3,31 @@ use bevy::{ecs::component::Component, math::Vec2};
 // TODO: check if bevy's 'pub struct Direction2d(Vec2)' isn't a better option to do this
 #[derive(Component, Clone, Copy)]
 pub struct Movement {
-    pub direction: Vec2,
-    pub speed: f32,
+    direction: Vec2,
+    pub max_speed: f32,
 }
 impl Movement {
-    pub fn velocity(self) -> Vec2 {
-        if self.direction == Vec2::ZERO {
-            Vec2::ZERO
-        } else {
-            self.direction.normalize() * self.speed
+    pub const fn from_max_speed(max_speed: f32) -> Self {
+        Self {
+            direction: Vec2::ZERO,
+            max_speed,
         }
+    }
+
+    pub fn from_velocity(velocity: Vec2) -> Self {
+        Self {
+            direction: velocity.normalize_or_zero(),
+            max_speed: velocity.length(),
+        }
+    }
+
+    pub fn set_direction(&mut self, from: Vec2) -> Vec2 {
+        self.direction = from.normalize_or_zero();
+        self.direction
+    }
+
+    pub fn get_velocity(&self) -> Vec2 {
+        self.direction * self.max_speed
     }
 }
 
