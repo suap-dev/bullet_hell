@@ -1,4 +1,4 @@
-use bevy::{ecs::bundle::Bundle, math::Vec2, sprite};
+use bevy::{ecs::bundle::Bundle, sprite};
 
 use crate::components::{attributes, markers};
 
