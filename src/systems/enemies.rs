@@ -22,9 +22,9 @@ pub fn spawn(
             meshes.add(RegularPolygon::new(circumradius.0, rng.gen_range(3..6))),
         );
         let material = materials.add(Color::rgb(
-            rng.gen_range(0.2..0.8),
-            rng.gen_range(0.0..0.2),
-            rng.gen_range(0.2..0.8),
+            rng.gen_range(0.4..0.6),
+            rng.gen_range(0.1..0.2),
+            rng.gen_range(0.4..0.8),
         ));
         let transform = Transform::from_xyz(
             rng.gen_range(-400.0..400.0),

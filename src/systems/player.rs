@@ -10,9 +10,9 @@ pub fn spawn(
     mut meshes: ResMut<Assets<Mesh>>,
     mut materials: ResMut<Assets<ColorMaterial>>,
 ) {
-    let circumradius = attributes::Circumradius(10.0);
+    let circumradius = attributes::Circumradius(6.0);
     let mesh = sprite::Mesh2dHandle(meshes.add(Circle::new(circumradius.0)));
-    let material = materials.add(Color::rgb(0.8, 0.8, 0.8));
+    let material = materials.add(Color::rgb(0.0, 0.8, 0.6));
     let transform = Transform::from_xyz(0.0, 0.0, -2.0);
 
     let material_mesh_bundle = sprite::MaterialMesh2dBundle {

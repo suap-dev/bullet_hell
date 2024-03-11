@@ -1,5 +1,6 @@
 use bevy::{ecs::component::Component, math::Vec2};
 
+// TODO: check if bevy's 'pub struct Direction2d(Vec2)' isn't a better option to do this
 #[derive(Component, Clone, Copy)]
 pub struct Movement {
     pub direction: Vec2,
