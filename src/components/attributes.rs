@@ -16,9 +16,6 @@ impl Movement {
 }
 
 #[derive(Component)]
-pub struct Velocity(pub Vec2);
-
-#[derive(Component)]
 pub struct AngularVelocity(pub f32);
 
 #[derive(Component)]

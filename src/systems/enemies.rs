@@ -7,7 +7,7 @@ use crate::{
     components::{attributes, markers},
 };
 
-const NR_OF_OBJECTS: usize = 200;
+const NR_OF_OBJECTS: usize = 100;
 
 pub fn spawn(
     mut commands: Commands,
@@ -55,9 +55,9 @@ pub fn update(
         (
             // Entity,
             &mut Transform,
+            &mut attributes::Movement,
             &attributes::LineOfSightRange,
-            &attributes::Velocity,
-            &mut attributes::AngularVelocity,
+            &attributes::AngularVelocity,
             &attributes::Circumradius,
         ),
         (With<markers::Enemy>, Without<markers::Player>),
@@ -84,7 +84,7 @@ pub fn update(
     // let mut closest: (Entity, f32) = (Entity::from_raw(0), f32::MAX);
 
     // TODO: rewrite it so it uses transform arithmetics and uses angular velocity in a cooler way
-    for (/*entity,*/ mut transform, los_range, velocity, angular_velocity, circumradius) in
+    for (/*entity,*/ mut transform, mut movement, los_range, angular_velocity, circumradius) in
         &mut query
     {
         // if dist_squared < closest.1 {
@@ -93,19 +93,10 @@ pub fn update(
 
         let position = transform.translation;
         let dist_squared = position.distance_squared(player_position);
-        let velocity = {
-            if dist_squared < los_range.0.powi(2) {
-                (player_position - position).xy().clamp_length(0.0, 1.0) * velocity.0.length()
-            } else {
-                velocity.0
-            }
-        };
+        if dist_squared < los_range.0.powi(2) {
+            movement.direction = (player_position - transform.translation).xy();
+        }
 
-        apply_velocity(
-            &mut transform.translation,
-            velocity.extend(0.0),
-            time.delta_seconds(),
-        );
         teleport_if_out_of_bounds(
             &mut transform.translation,
             circumradius.0,
@@ -118,10 +109,6 @@ pub fn update(
             angular_velocity.0 * time.delta_seconds(),
         ));
     }
-}
-
-fn apply_velocity(translation: &mut Vec3, velocity: Vec3, delta_seconds: f32) {
-    *translation += velocity * delta_seconds;
 }
 
 fn teleport_if_out_of_bounds(
