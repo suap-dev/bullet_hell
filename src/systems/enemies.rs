@@ -91,12 +91,14 @@ pub fn update(
         //     closest = (entity, dist_squared);
         // }
 
+        // TODO: make it a separate system "seek_player"
         let position = transform.translation;
         let dist_squared = position.distance_squared(player_position);
         if dist_squared < los_range.0.powi(2) {
             movement.direction = (player_position - transform.translation).xy();
         }
 
+        // TODO: make it a separate system, more generic, that could also update player and possibly let you chose the offset of out of bounds calculation
         teleport_if_out_of_bounds(
             &mut transform.translation,
             circumradius.0,
@@ -105,6 +107,8 @@ pub fn update(
             bottom_border,
             top_border,
         );
+
+        // TODO: not sure if we want this to randomly rotate all the time. maybe some more situation based rotation?
         transform.rotate(Quat::from_rotation_z(
             angular_velocity.0 * time.delta_seconds(),
         ));
