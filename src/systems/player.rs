@@ -1,4 +1,4 @@
-use bevy::{prelude::*, sprite};
+use bevy::{math::vec2, prelude::*, sprite};
 
 use crate::{
     bundles,
@@ -59,4 +59,29 @@ pub fn movement_input(
     }
 
     player.single_mut().set_direction(direction);
+}
+
+pub fn find_closest_enemy(
+    player: Query<(&Transform, &mut attributes::NearestEnemy), With<markers::Player>>,
+    enemies: Query<&Transform, With<markers::Enemy>>,
+) {
+    let position = player.single().0.translation.xy();
+
+    let mut distance_squared = f32::MAX;
+    let mut nearest_enemy = vec2(0.0, 0.0);
+
+    for enemy_transform in &enemies {
+        (distance_squared, nearest_enemy) = {
+            let to_enemy = enemy_transform.translation.xy() - position;
+            let new_distance_squared = to_enemy.length_squared();
+
+            if new_distance_squared < distance_squared {
+                (new_distance_squared, to_enemy)
+            } else {
+                (distance_squared, nearest_enemy)
+            }
+        }
+    }
+
+    player.single().1 = &attributes::NearestEnemy(nearest_enemy);
 }

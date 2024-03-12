@@ -32,6 +32,9 @@ impl Movement {
 }
 
 #[derive(Component)]
+pub struct NearestEnemy(pub Vec2);
+
+#[derive(Component)]
 pub struct AngularVelocity(pub f32);
 
 #[derive(Component)]

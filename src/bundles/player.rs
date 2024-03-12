@@ -1,4 +1,4 @@
-use bevy::{ecs::bundle::Bundle, sprite};
+use bevy::{ecs::bundle::Bundle, math::Vec2, sprite};
 
 use crate::components::{attributes, markers};
 
@@ -8,6 +8,7 @@ pub struct Player {
     pub material_mesh_bundle: sprite::MaterialMesh2dBundle<sprite::ColorMaterial>,
     pub circumradius: attributes::Circumradius,
     pub movement: attributes::Movement,
+    pub nearest_enemy: attributes::NearestEnemy,
 }
 impl Default for Player {
     fn default() -> Self {
@@ -16,6 +17,7 @@ impl Default for Player {
             material_mesh_bundle: sprite::MaterialMesh2dBundle::default(),
             circumradius: attributes::Circumradius(-1.0),
             movement: attributes::Movement::from_max_speed(80.0),
+            nearest_enemy: attributes::NearestEnemy(Vec2::default()),
         }
     }
 }

@@ -54,6 +54,7 @@ fn main() {
     // player
     .add_systems(Startup, player::spawn)
     .add_systems(Update, player::movement_input)
+    .add_systems(Update, player::find_closest_enemy)
     // enemies
     .add_systems(Startup, enemies::spawn)
     .add_systems(Update, enemies::seek_player)
