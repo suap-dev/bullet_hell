@@ -60,13 +60,14 @@ pub fn seek_player(
     >,
     player_transform: Query<&Transform, With<markers::Player>>,
 ) {
-    let player_position = player_transform.single().translation;
+    let player_position = player_transform.single().translation.xy();
 
     for (mut movement, transform, los_range) in &mut query {
-        let position = transform.translation;
-        let dist_squared = position.distance_squared(player_position);
-        if dist_squared < los_range.0.powi(2) {
-            movement.set_direction((player_position - position).xy());
+        let position = transform.translation.xy();
+        let to_player = player_position - position;
+
+        if to_player.length_squared() < los_range.0.powi(2) {
+            movement.set_direction(to_player);
         }
     }
 }
