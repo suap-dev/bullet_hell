@@ -4,3 +4,4 @@ mod projectile;
 
 pub use enemy::*;
 pub use player::*;
+pub use projectile::*;

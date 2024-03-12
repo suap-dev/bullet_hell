@@ -61,27 +61,64 @@ pub fn movement_input(
     player.single_mut().set_direction(direction);
 }
 
-pub fn find_closest_enemy(
-    player: Query<(&Transform, &mut attributes::NearestEnemy), With<markers::Player>>,
+pub fn find_nearest_enemy(
+    mut player: Query<(&Transform, &mut attributes::NearestEnemy), With<markers::Player>>,
     enemies: Query<&Transform, With<markers::Enemy>>,
 ) {
-    let position = player.single().0.translation.xy();
+    let (transform, mut nearest_enemy) = player.single_mut();
+    let position = transform.translation.xy();
 
     let mut distance_squared = f32::MAX;
-    let mut nearest_enemy = vec2(0.0, 0.0);
+    let mut to_nearest_enemy = vec2(0.0, 0.0);
 
     for enemy_transform in &enemies {
-        (distance_squared, nearest_enemy) = {
+        (distance_squared, to_nearest_enemy) = {
             let to_enemy = enemy_transform.translation.xy() - position;
             let new_distance_squared = to_enemy.length_squared();
 
             if new_distance_squared < distance_squared {
                 (new_distance_squared, to_enemy)
             } else {
-                (distance_squared, nearest_enemy)
+                (distance_squared, to_nearest_enemy)
             }
         }
     }
 
-    player.single().1 = &attributes::NearestEnemy(nearest_enemy);
+    *nearest_enemy = attributes::NearestEnemy(to_nearest_enemy);
+}
+
+// TODO: tidy this up, please... I was really tired when I coded this :|
+pub fn shoot_nearest_enemy(
+    nearest_enemy: Query<(&Transform, &attributes::NearestEnemy), With<markers::Player>>,
+    mut commands: Commands,
+    mut meshes: ResMut<Assets<Mesh>>,
+    mut materials: ResMut<Assets<ColorMaterial>>,
+) {
+    let (transform, nearest_enemy) = nearest_enemy.single();
+    let (position, to_nearest_enemy) = (transform.translation.xy(), nearest_enemy.0);
+
+    if to_nearest_enemy.length_squared() > 0.0 {
+        let circumradius = attributes::Circumradius(2.0);
+        let mesh = sprite::Mesh2dHandle(meshes.add(Circle::new(circumradius.0)));
+        let material = materials.add(Color::rgb(0.6, 1.0, 0.0));
+        let transform = Transform::from_translation(position.extend(-1.0));
+
+        let movement = attributes::Movement::new(to_nearest_enemy, 40.0);
+
+        let material_mesh_bundle = sprite::MaterialMesh2dBundle {
+            mesh,
+            material,
+            transform,
+            ..default()
+        };
+
+        commands.spawn(bundles::Projectile {
+            marker: markers::Projectile,
+            material_mesh_bundle,
+            circumradius,
+            movement,
+            range: attributes::Range(100.0),
+            lifespan: attributes::LifeSpan(2.0),
+        });
+    }
 }

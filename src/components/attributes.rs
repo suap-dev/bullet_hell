@@ -7,6 +7,12 @@ pub struct Movement {
     pub max_speed: f32,
 }
 impl Movement {
+    pub fn new(direction: Vec2, max_speed: f32) -> Self {
+        let mut new = Self::from_max_speed(max_speed);
+        new.set_direction(direction);
+        new
+    }
+
     pub const fn from_max_speed(max_speed: f32) -> Self {
         Self {
             direction: Vec2::ZERO,
