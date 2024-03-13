@@ -29,7 +29,8 @@ fn main() {
         bottom: -LOGICAL_HEIGHT / 2.0,
         right: LOGICAL_WIDTH / 2.0,
         left: -LOGICAL_WIDTH / 2.0,
-    });
+    })
+    .insert_resource(Time::<Fixed>::from_hz(6.0));
 
     #[cfg(debug_assertions)]
     {
@@ -54,8 +55,8 @@ fn main() {
     // player
     .add_systems(Startup, player::spawn)
     .add_systems(Update, player::movement_input)
-    .add_systems(Update, player::find_nearest_enemy)
-    .add_systems(Update, player::shoot_nearest_enemy)
+    .add_systems(FixedUpdate, player::find_nearest_enemy)
+    .add_systems(FixedUpdate, player::shoot_nearest_enemy)
     // enemies
     .add_systems(Startup, enemies::spawn)
     .add_systems(Update, enemies::seek_player)
