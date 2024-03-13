@@ -15,8 +15,10 @@ pub fn living(
 ) {
     let delta = time.delta();
     for (entity, mut lifespan) in &mut lifespans {
-        if lifespan.0.tick(delta).finished() {
-            commands.entity(entity).despawn();
+        if let Some(mut e) = commands.get_entity(entity) {
+            if lifespan.0.tick(delta).finished() {
+                e.despawn();
+            }
         }
     }
 }
