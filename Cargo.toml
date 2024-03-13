@@ -7,7 +7,7 @@ edition = "2021"
 all = "warn"
 pedantic = "warn"
 nursery = "warn"
-needless_pass_by_value = "allow"
+needless_pass_by_value = { level = "allow", priority = 1 }
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
