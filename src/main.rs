@@ -69,5 +69,7 @@ fn main() {
             transform::teleport_at_borders,
         ),
     )
+    // generic
+    .add_systems(Update, generic::living)
     .run();
 }

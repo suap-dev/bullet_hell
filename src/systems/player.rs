@@ -10,27 +10,25 @@ pub fn spawn(
     mut meshes: ResMut<Assets<Mesh>>,
     mut materials: ResMut<Assets<ColorMaterial>>,
 ) {
-    let circumradius = attributes::Circumradius(6.0);
-    let mesh = sprite::Mesh2dHandle(meshes.add(Circle::new(circumradius.0)));
-    let material = materials.add(Color::rgb(0.0, 0.8, 0.6));
-    let transform = Transform::from_xyz(0.0, 0.0, -2.0);
+    let circumradius = 6.0;
 
     let material_mesh_bundle = sprite::MaterialMesh2dBundle {
-        mesh,
-        material,
-        transform,
+        mesh: sprite::Mesh2dHandle(meshes.add(Circle::new(circumradius))),
+        material: materials.add(Color::rgb(0.0, 0.8, 0.6)),
+        transform: Transform::from_xyz(0.0, 0.0, -2.0),
         ..default()
     };
 
     commands.spawn(bundles::Player {
         material_mesh_bundle,
-        circumradius,
+        circumradius: attributes::Circumradius(circumradius),
+        movement: attributes::Movement::from_max_speed(80.0),
         ..default()
     });
 }
 
 pub fn movement_input(
-    mut player: Query<&mut attributes::Movement, (With<markers::Player>, Without<markers::Enemy>)>,
+    mut player: Query<&mut attributes::Movement, With<markers::Player>>,
     keyboard_input: Res<ButtonInput<KeyCode>>,
 ) {
     let mut direction = Vec2::ZERO;
@@ -98,27 +96,22 @@ pub fn shoot_nearest_enemy(
     let (position, to_nearest_enemy) = (transform.translation.xy(), nearest_enemy.0);
 
     if to_nearest_enemy.length_squared() > 0.0 {
-        let circumradius = attributes::Circumradius(2.0);
-        let mesh = sprite::Mesh2dHandle(meshes.add(Circle::new(circumradius.0)));
-        let material = materials.add(Color::rgb(0.6, 1.0, 0.0));
-        let transform = Transform::from_translation(position.extend(-1.0));
-
-        let movement = attributes::Movement::new(to_nearest_enemy, 40.0);
+        let circumradius = 2.0;
 
         let material_mesh_bundle = sprite::MaterialMesh2dBundle {
-            mesh,
-            material,
-            transform,
+            mesh: sprite::Mesh2dHandle(meshes.add(Circle::new(circumradius))),
+            material: materials.add(Color::rgb(0.6, 1.0, 0.0)),
+            transform: Transform::from_translation(position.extend(-1.0)),
             ..default()
         };
 
         commands.spawn(bundles::Projectile {
-            marker: markers::Projectile,
             material_mesh_bundle,
-            circumradius,
-            movement,
-            range: attributes::Range(100.0),
-            lifespan: attributes::LifeSpan(2.0),
+            circumradius: attributes::Circumradius(circumradius),
+            movement: attributes::Movement::new(to_nearest_enemy, 200.0),
+            marker: markers::Projectile,
+            lifespan: attributes::LifeSpan(Timer::from_seconds(1.5, TimerMode::Once)),
+            ..default()
         });
     }
 }
