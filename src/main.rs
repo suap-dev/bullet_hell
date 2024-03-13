@@ -60,6 +60,8 @@ fn main() {
     // enemies
     .add_systems(Startup, enemies::spawn)
     .add_systems(Update, enemies::seek_player)
+    // projectiles
+    .add_systems(Update, projectiles::deal_damage)
     // transforms
     .add_systems(
         Update,
