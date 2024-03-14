@@ -41,16 +41,16 @@ impl Movement {
 #[derive(Component, Default)]
 pub struct NearestEnemy(pub Vec2);
 
-#[derive(Component)]
+#[derive(Component, Default)]
 pub struct AngularVelocity(pub f32);
 
 #[derive(Component, Default)]
 pub struct Circumradius(pub f32);
 
-#[derive(Component)]
+#[derive(Component, Default)]
 pub struct HitPoints(pub f32);
 
-#[derive(Component)]
+#[derive(Component, Default)]
 pub struct LineOfSightRange(pub f32);
 
 #[derive(Component, Default)]
@@ -58,3 +58,6 @@ pub struct Range(pub f32);
 
 #[derive(Component, Default)]
 pub struct LifeSpan(pub Timer);
+
+#[derive(Component, Default)]
+pub struct Damage(pub f32);

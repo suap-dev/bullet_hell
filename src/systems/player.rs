@@ -107,6 +107,7 @@ pub fn shoot_nearest_enemy(
 
         commands.spawn(bundles::Projectile {
             material_mesh_bundle,
+            damage: attributes::Damage(10.0),
             circumradius: attributes::Circumradius(circumradius),
             movement: attributes::Movement::new(to_nearest_enemy, 200.0),
             marker: markers::Projectile,

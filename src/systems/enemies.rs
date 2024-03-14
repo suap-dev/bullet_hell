@@ -1,4 +1,4 @@
-use bevy::{prelude::*, sprite};
+use bevy::{math::vec2, prelude::*, sprite};
 use rand::Rng;
 use std::f32::consts::TAU;
 
@@ -44,6 +44,14 @@ pub fn spawn(
 
         commands.spawn(bundles::Enemy {
             material_mesh_bundle,
+            circumradius: attributes::Circumradius(rng.gen_range(5.0..10.0)),
+            movement: attributes::Movement::from_velocity(vec2(
+                rng.gen_range(-20.0..20.0),
+                rng.gen_range(-20.0..20.0),
+            )),
+            hitpoints: attributes::HitPoints(rng.gen_range(9.0..=40.0)),
+            los_range: attributes::LineOfSightRange(rng.gen_range(100.0..300.0)),
+            angular_velocity: attributes::AngularVelocity(rng.gen_range(-2.0..2.0)),
             ..default()
         });
     }

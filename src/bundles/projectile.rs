@@ -6,6 +6,7 @@ use crate::components::{attributes, markers};
 pub struct Projectile {
     pub marker: markers::Projectile,
     pub material_mesh_bundle: sprite::MaterialMesh2dBundle<sprite::ColorMaterial>,
+    pub damage: attributes::Damage,
     pub circumradius: attributes::Circumradius,
     pub movement: attributes::Movement,
     pub range: attributes::Range,
