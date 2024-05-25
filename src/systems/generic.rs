@@ -8,7 +8,7 @@ use bevy::{
 
 use crate::components::attributes;
 
-pub fn living(
+pub fn death(
     mut commands: Commands,
     mut with_lifespan: Query<(Entity, &mut attributes::LifeSpan)>,
     with_hitpoints: Query<(Entity, &attributes::HitPoints)>,
@@ -30,3 +30,5 @@ pub fn living(
         }
     }
 }
+
+

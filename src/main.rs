@@ -30,7 +30,7 @@ fn main() {
         right: LOGICAL_WIDTH / 2.0,
         left: -LOGICAL_WIDTH / 2.0,
     })
-    .insert_resource(Time::<Fixed>::from_hz(6.0));
+        .insert_resource(Time::<Fixed>::from_hz(6.0));
 
     #[cfg(debug_assertions)]
     {
@@ -50,28 +50,28 @@ fn main() {
         }),
         ..default()
     }))
-    // level setup
-    .add_systems(Startup, camera::setup)
-    // player
-    .add_systems(Startup, player::spawn)
-    .add_systems(Update, player::movement_input)
-    .add_systems(FixedUpdate, player::find_nearest_enemy)
-    .add_systems(FixedUpdate, player::shoot_nearest_enemy)
-    // enemies
-    .add_systems(Startup, enemies::spawn)
-    .add_systems(Update, enemies::seek_player)
-    // projectiles
-    .add_systems(Update, projectiles::deal_damage)
-    // transforms
-    .add_systems(
-        Update,
-        (
-            transform::apply_velocity,
-            transform::apply_angular_velocity,
-            transform::teleport_at_borders,
-        ),
-    )
-    // generic
-    .add_systems(Update, generic::living)
-    .run();
+        // level setup
+        .add_systems(Startup, camera::setup)
+        // player
+        .add_systems(Startup, player::spawn)
+        .add_systems(Update, player::movement_input)
+        .add_systems(FixedUpdate, player::find_nearest_enemy)
+        .add_systems(FixedUpdate, player::shoot_nearest_enemy)
+        // enemies
+        .add_systems(Startup, enemies::spawn)
+        .add_systems(Update, enemies::player_seeking)
+        // projectiles
+        .add_systems(Update, projectiles::deal_damage)
+        // transforms
+        .add_systems(
+            Update,
+            (
+                transform::apply_velocity,
+                transform::apply_angular_velocity,
+                transform::teleport_at_borders,
+            ),
+        )
+        // generic
+        .add_systems(Update, generic::death)
+        .run();
 }

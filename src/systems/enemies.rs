@@ -33,7 +33,7 @@ pub fn spawn(
             rng.gen_range(borders.bottom..borders.top) * 0.95,
             rng.gen_range(-1.0..1.0),
         )
-        .with_rotation(Quat::from_rotation_z(rng.gen_range(0.0..TAU)));
+            .with_rotation(Quat::from_rotation_z(rng.gen_range(0.0..TAU)));
 
         let material_mesh_bundle = sprite::MaterialMesh2dBundle {
             mesh,
@@ -57,7 +57,7 @@ pub fn spawn(
     }
 }
 
-pub fn seek_player(
+pub fn player_seeking(
     mut query: Query<
         (
             &mut attributes::Movement,
