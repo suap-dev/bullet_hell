@@ -5,10 +5,9 @@ use std::f32::consts::TAU;
 use crate::{
     bundles,
     components::{attributes, markers},
+    config::ENEMIES_NUMBER,
     Borders,
 };
-
-const NR_OF_OBJECTS: usize = 100;
 
 pub fn spawn(
     mut commands: Commands,
@@ -18,7 +17,7 @@ pub fn spawn(
 ) {
     let mut rng = rand::thread_rng();
 
-    for _ in 0..NR_OF_OBJECTS {
+    for _ in 0..ENEMIES_NUMBER {
         let circumradius = attributes::Circumradius(rng.gen_range(5.0..10.0));
         let mesh = sprite::Mesh2dHandle(
             meshes.add(RegularPolygon::new(circumradius.0, rng.gen_range(3..6))),
@@ -33,7 +32,7 @@ pub fn spawn(
             rng.gen_range(borders.bottom..borders.top) * 0.95,
             rng.gen_range(-1.0..1.0),
         )
-            .with_rotation(Quat::from_rotation_z(rng.gen_range(0.0..TAU)));
+        .with_rotation(Quat::from_rotation_z(rng.gen_range(0.0..TAU)));
 
         let material_mesh_bundle = sprite::MaterialMesh2dBundle {
             mesh,

@@ -15,20 +15,17 @@ needless_pass_by_value = { level = "allow", priority = 1 }
 resolver = "2" # Important! wgpu/Bevy needs this!
 
 [dependencies]
-# bevy = { version = "0.13.0", features = ["dynamic_linking"] }
 rand = "0.8.5"
 
 [dependencies.bevy]
 version = "0.13.2"
-# Disable the default features if there are any that you do not want
 default-features = false
 features = [
-    # These are the default features:
-    # (re-enable whichever you like)
+    ## Default features:
 
     # Bevy functionality:
     "multi-threaded", # Run with multithreading
-    "bevy_asset", # Assets management
+    "bevy_asset",     # Assets management
     # "bevy_audio",         # Builtin audio
     # "bevy_gilrs",         # Gamepad input support
     # "bevy_scene", # Scenes management
@@ -57,8 +54,8 @@ features = [
     # "android_shared_stdcxx", # Android: use shared C++ library
     # "webgl2",                # Web: use WebGL2 instead of WebGPU
 
-    # These are other (non-default) features that may be of interest:
-    # (add any of these that you need)
+
+    ## Non-default features
 
     # Bevy functionality:
     # "asset_processor",           # Asset processing
@@ -103,14 +100,13 @@ features = [
     # "embedded_watcher",   # Hot-reloading for Bevy's internal/builtin assets
 ]
 
-# Enable Link-Time-Optimization for release build for --release build
 [profile.release]
-lto = true
+lto = true      # link time optimizations
+opt-level = "s"
 
-# Enable a small amount of optimization in debug mode
 [profile.dev]
 opt-level = 1
 
-# Enable high optimizations for dependencies (incl. Bevy), but not for our code:
+# Dependencies, including Bevy
 [profile.dev.package."*"]
 opt-level = 3
