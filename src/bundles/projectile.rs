@@ -1,11 +1,11 @@
-use bevy::{ecs::bundle::Bundle, sprite};
+use bevy::ecs::bundle::Bundle;
 
 use crate::components::{attributes, markers};
 
 #[derive(Bundle, Default)]
 pub struct Projectile {
     pub marker: markers::Projectile,
-    pub material_mesh_bundle: sprite::MaterialMesh2dBundle<sprite::ColorMaterial>,
+    // pub material_mesh_bundle: sprite::MaterialMesh2dBundle<sprite::ColorMaterial>,
     pub damage: attributes::Damage,
     pub circumradius: attributes::Circumradius,
     pub movement: attributes::Movement,

@@ -6,7 +6,7 @@ use crate::{components::attributes, config::FIX_AT_TELEPORT_EXIT, Borders};
 
 pub fn apply_velocity(time: Res<Time>, mut query: Query<(&mut Transform, &attributes::Movement)>) {
     for (mut transform, movement) in &mut query {
-        transform.translation += (movement.get_velocity() * time.delta_seconds()).extend(0.0);
+        transform.translation += (movement.get_velocity() * time.delta_secs()).extend(0.0);
     }
 }
 
@@ -17,7 +17,7 @@ pub fn apply_angular_velocity(
 ) {
     for (mut transform, angular_velocity) in &mut query {
         transform.rotate(Quat::from_rotation_z(
-            angular_velocity.0 * time.delta_seconds(),
+            angular_velocity.0 * time.delta_secs(),
         ));
     }
 }

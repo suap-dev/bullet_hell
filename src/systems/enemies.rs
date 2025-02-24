@@ -1,4 +1,4 @@
-use bevy::{math::vec2, prelude::*, sprite};
+use bevy::{math::vec2, prelude::*};
 use rand::Rng;
 use std::f32::consts::TAU;
 
@@ -15,44 +15,42 @@ pub fn spawn(
     mut materials: ResMut<Assets<ColorMaterial>>,
     borders: Res<Borders>,
 ) {
-    let mut rng = rand::thread_rng();
+    let mut rng = rand::rng();
 
     for _ in 0..ENEMIES_NUMBER {
-        let circumradius = attributes::Circumradius(rng.gen_range(5.0..10.0));
-        let mesh = sprite::Mesh2dHandle(
-            meshes.add(RegularPolygon::new(circumradius.0, rng.gen_range(3..6))),
-        );
-        let material = materials.add(Color::rgb(
-            rng.gen_range(0.4..0.6),
-            rng.gen_range(0.1..0.2),
-            rng.gen_range(0.4..0.8),
-        ));
-        let transform = Transform::from_xyz(
-            rng.gen_range(borders.left..borders.right) * 0.95,
-            rng.gen_range(borders.bottom..borders.top) * 0.95,
-            rng.gen_range(-1.0..1.0),
-        )
-        .with_rotation(Quat::from_rotation_z(rng.gen_range(0.0..TAU)));
+        let circumradius = attributes::Circumradius(rng.random_range(5.0..10.0));
+        let material_mesh_bundle = {
+            let mesh =
+                Mesh2d(meshes.add(RegularPolygon::new(circumradius.0, rng.random_range(3..6))));
+            let material = MeshMaterial2d(materials.add(Color::srgb(
+                rng.random_range(0.4..0.6),
+                rng.random_range(0.1..0.2),
+                rng.random_range(0.4..0.8),
+            )));
+            let transform = Transform::from_xyz(
+                rng.random_range(borders.left..borders.right) * 0.95,
+                rng.random_range(borders.bottom..borders.top) * 0.95,
+                rng.random_range(-1.0..1.0),
+            )
+            .with_rotation(Quat::from_rotation_z(rng.random_range(0.0..TAU)));
 
-        let material_mesh_bundle = sprite::MaterialMesh2dBundle {
-            mesh,
-            material,
-            transform,
-            ..default()
+            (mesh, material, transform)
         };
 
-        commands.spawn(bundles::Enemy {
-            material_mesh_bundle,
-            circumradius: attributes::Circumradius(rng.gen_range(5.0..10.0)),
-            movement: attributes::Movement::from_velocity(vec2(
-                rng.gen_range(-20.0..20.0),
-                rng.gen_range(-20.0..20.0),
-            )),
-            hitpoints: attributes::HitPoints(rng.gen_range(9.0..=40.0)),
-            los_range: attributes::LineOfSightRange(rng.gen_range(100.0..300.0)),
-            angular_velocity: attributes::AngularVelocity(rng.gen_range(-2.0..2.0)),
-            ..default()
-        });
+        // TODO: handle material_mesh_bundle situation properly
+        commands
+            .spawn(bundles::Enemy {
+                circumradius,
+                movement: attributes::Movement::from_velocity(vec2(
+                    rng.random_range(-20.0..20.0),
+                    rng.random_range(-20.0..20.0),
+                )),
+                hitpoints: attributes::HitPoints(rng.random_range(9.0..=40.0)),
+                los_range: attributes::LineOfSightRange(rng.random_range(100.0..300.0)),
+                angular_velocity: attributes::AngularVelocity(rng.random_range(-2.0..2.0)),
+                ..default()
+            })
+            .insert(material_mesh_bundle);
     }
 }
 
