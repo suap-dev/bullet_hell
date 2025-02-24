@@ -3,7 +3,7 @@ use rand::Rng;
 use std::f32::consts::TAU;
 
 use crate::{
-    bundles,
+    bundles::{self, ProtoSprite},
     components::{attributes, markers},
     config::ENEMIES_NUMBER,
     Borders,
@@ -19,38 +19,34 @@ pub fn spawn(
 
     for _ in 0..ENEMIES_NUMBER {
         let circumradius = attributes::Circumradius(rng.random_range(5.0..10.0));
-        let material_mesh_bundle = {
-            let mesh =
-                Mesh2d(meshes.add(RegularPolygon::new(circumradius.0, rng.random_range(3..6))));
-            let material = MeshMaterial2d(materials.add(Color::srgb(
+        let sprite = ProtoSprite {
+            mesh: Mesh2d(meshes.add(RegularPolygon::new(circumradius.0, rng.random_range(3..6)))),
+            material: MeshMaterial2d(materials.add(Color::srgb(
                 rng.random_range(0.4..0.6),
                 rng.random_range(0.1..0.2),
                 rng.random_range(0.4..0.8),
-            )));
-            let transform = Transform::from_xyz(
-                rng.random_range(borders.left..borders.right) * 0.95,
-                rng.random_range(borders.bottom..borders.top) * 0.95,
-                rng.random_range(-1.0..1.0),
-            )
-            .with_rotation(Quat::from_rotation_z(rng.random_range(0.0..TAU)));
-
-            (mesh, material, transform)
+            ))),
         };
+        let transform = Transform::from_xyz(
+            rng.random_range(borders.left..borders.right) * 0.95,
+            rng.random_range(borders.bottom..borders.top) * 0.95,
+            rng.random_range(-1.0..1.0),
+        )
+        .with_rotation(Quat::from_rotation_z(rng.random_range(0.0..TAU)));
 
-        // TODO: handle material_mesh_bundle situation properly
-        commands
-            .spawn(bundles::Enemy {
-                circumradius,
-                movement: attributes::Movement::from_velocity(vec2(
-                    rng.random_range(-20.0..20.0),
-                    rng.random_range(-20.0..20.0),
-                )),
-                hitpoints: attributes::HitPoints(rng.random_range(9.0..=40.0)),
-                los_range: attributes::LineOfSightRange(rng.random_range(100.0..300.0)),
-                angular_velocity: attributes::AngularVelocity(rng.random_range(-2.0..2.0)),
-                ..default()
-            })
-            .insert(material_mesh_bundle);
+        commands.spawn(bundles::Enemy {
+            sprite,
+            transform,
+            circumradius,
+            movement: attributes::Movement::from_velocity(vec2(
+                rng.random_range(-20.0..20.0),
+                rng.random_range(-20.0..20.0),
+            )),
+            hitpoints: attributes::HitPoints(rng.random_range(9.0..=40.0)),
+            los_range: attributes::LineOfSightRange(rng.random_range(100.0..300.0)),
+            angular_velocity: attributes::AngularVelocity(rng.random_range(-2.0..2.0)),
+            ..default()
+        });
     }
 }
 

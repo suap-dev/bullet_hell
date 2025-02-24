@@ -1,7 +1,7 @@
 use bevy::{math::vec2, prelude::*};
 
 use crate::{
-    bundles,
+    bundles::{self, ProtoSprite},
     components::{attributes, markers},
 };
 
@@ -12,21 +12,18 @@ pub fn spawn(
 ) {
     let circumradius = 6.0;
 
-    let material_mesh_bundle = (
-        Mesh2d(meshes.add(Circle::new(circumradius))),
-        MeshMaterial2d(materials.add(Color::srgb(0.0, 0.8, 0.6))),
-        Transform::from_xyz(0.0, 0.0, -2.0),
-    );
+    let sprite = ProtoSprite {
+        mesh: Mesh2d(meshes.add(Circle::new(circumradius))),
+        material: MeshMaterial2d(materials.add(Color::srgb(0.0, 0.8, 0.6))),
+    };
 
-    // TODO: handle material_mesh_bundle situation properly
-    commands
-        .spawn(bundles::Player {
-            // material_mesh_bundle,
-            circumradius: attributes::Circumradius(circumradius),
-            movement: attributes::Movement::from_max_speed(80.0),
-            ..default()
-        })
-        .insert(material_mesh_bundle);
+    commands.spawn(bundles::Player {
+        sprite,
+        transform: Transform::from_xyz(0.0, 0.0, -2.0),
+        circumradius: attributes::Circumradius(circumradius),
+        movement: attributes::Movement::from_max_speed(80.0),
+        ..default()
+    });
 }
 
 pub fn movement_input(
@@ -100,21 +97,19 @@ pub fn shoot_nearest_enemy(
     if player_position.distance_squared(enemy_position) > 0.0 {
         let circumradius = 2.0;
 
-        let material_mesh_bundle = (
-            Mesh2d(meshes.add(Circle::new(circumradius))),
-            MeshMaterial2d(materials.add(Color::srgb(0.6, 1.0, 0.0))),
-            Transform::from_translation(player_position.extend(-1.0)),
-        );
+        let sprite = ProtoSprite {
+            mesh: Mesh2d(meshes.add(Circle::new(circumradius))),
+            material: MeshMaterial2d(materials.add(Color::srgb(0.6, 1.0, 0.0))),
+        };
 
-        // TODO: handle material_mesh_bundle situation properly
-        commands
-            .spawn(bundles::Projectile {
-                damage: attributes::Damage(10.0),
-                circumradius: attributes::Circumradius(circumradius),
-                movement: attributes::Movement::new(enemy_position - player_position, 200.0),
-                marker: markers::Projectile,
-                lifespan: attributes::LifeSpan(Timer::from_seconds(1.5, TimerMode::Once)),
-            })
-            .insert(material_mesh_bundle);
+        commands.spawn(bundles::Projectile {
+            damage: attributes::Damage(10.0),
+            sprite,
+            transform: Transform::from_translation(player_position.extend(-1.0)),
+            circumradius: attributes::Circumradius(circumradius),
+            movement: attributes::Movement::new(enemy_position - player_position, 200.0),
+            marker: markers::Projectile,
+            lifespan: attributes::LifeSpan(Timer::from_seconds(1.5, TimerMode::Once)),
+        });
     }
 }
