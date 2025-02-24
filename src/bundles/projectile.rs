@@ -11,7 +11,7 @@ pub struct Projectile<M: Material2d> {
     pub sprite: ProtoSprite<M>,
     pub transform: Transform,
     pub damage: attributes::Damage,
-    pub circumradius: attributes::Circumradius,
+    pub collision_radius: attributes::CollisionRadius,
     pub movement: attributes::Movement,
     // pub range: attributes::Range,
     pub lifespan: attributes::LifeSpan,

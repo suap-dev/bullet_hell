@@ -15,7 +15,7 @@ pub fn deal_damage(
         (
             Entity,
             &Transform,
-            &attributes::Circumradius,
+            &attributes::CollisionRadius,
             &attributes::Damage,
         ),
         With<markers::Projectile>,
@@ -23,7 +23,7 @@ pub fn deal_damage(
     mut enemies: Query<
         (
             &Transform,
-            &attributes::Circumradius,
+            &attributes::CollisionRadius,
             &mut attributes::HitPoints,
         ),
         With<markers::Enemy>,

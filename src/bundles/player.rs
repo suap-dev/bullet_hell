@@ -10,7 +10,7 @@ pub struct Player<M: Material2d> {
     pub marker: markers::Player,
     pub sprite: ProtoSprite<M>,
     pub transform: Transform,
-    pub circumradius: attributes::Circumradius,
+    pub collision_radius: attributes::CollisionRadius,
     pub movement: attributes::Movement,
     pub nearest_enemy: attributes::NearestEnemy,
 }

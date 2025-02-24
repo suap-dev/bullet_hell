@@ -18,7 +18,7 @@ pub fn spawn(
     let mut rng = rand::rng();
 
     for _ in 0..ENEMIES_NUMBER {
-        let circumradius = attributes::Circumradius(rng.random_range(5.0..10.0));
+        let circumradius = attributes::CollisionRadius(rng.random_range(5.0..10.0));
         let sprite = ProtoSprite {
             mesh: Mesh2d(meshes.add(RegularPolygon::new(circumradius.0, rng.random_range(3..6)))),
             material: MeshMaterial2d(materials.add(Color::srgb(
@@ -37,7 +37,7 @@ pub fn spawn(
         commands.spawn(bundles::Enemy {
             sprite,
             transform,
-            circumradius,
+            collision_radius: circumradius,
             movement: attributes::Movement::from_velocity(vec2(
                 rng.random_range(-20.0..20.0),
                 rng.random_range(-20.0..20.0),

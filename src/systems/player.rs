@@ -20,7 +20,7 @@ pub fn spawn(
     commands.spawn(bundles::Player {
         sprite,
         transform: Transform::from_xyz(0.0, 0.0, -2.0),
-        circumradius: attributes::Circumradius(circumradius),
+        collision_radius: attributes::CollisionRadius(circumradius),
         movement: attributes::Movement::from_max_speed(80.0),
         ..default()
     });
@@ -106,7 +106,7 @@ pub fn shoot_nearest_enemy(
             damage: attributes::Damage(10.0),
             sprite,
             transform: Transform::from_translation(player_position.extend(-1.0)),
-            circumradius: attributes::Circumradius(circumradius),
+            collision_radius: attributes::CollisionRadius(circumradius),
             movement: attributes::Movement::new(enemy_position - player_position, 200.0),
             marker: markers::Projectile,
             lifespan: attributes::LifeSpan(Timer::from_seconds(1.5, TimerMode::Once)),

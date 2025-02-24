@@ -25,7 +25,7 @@ pub fn apply_angular_velocity(
 pub fn teleport_at_borders(
     // window: Query<&Window>,
     borders: Res<Borders>,
-    mut query: Query<(&mut Transform, &attributes::Circumradius)>,
+    mut query: Query<(&mut Transform, &attributes::CollisionRadius)>,
 ) {
     for (mut transform, circumradius) in &mut query {
         cycle_coords(
