@@ -9,6 +9,6 @@ pub struct Projectile {
     pub damage: attributes::Damage,
     pub circumradius: attributes::Circumradius,
     pub movement: attributes::Movement,
-    pub range: attributes::Range,
+    // pub range: attributes::Range,
     pub lifespan: attributes::LifeSpan,
 }

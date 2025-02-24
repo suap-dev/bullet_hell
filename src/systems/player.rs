@@ -93,7 +93,7 @@ pub fn shoot_nearest_enemy(
 ) {
     let player = player.single();
     let player_position = player.0.translation.xy();
-    let enemy_position = player.1.0;
+    let enemy_position = player.1 .0;
 
     if player_position.distance_squared(enemy_position) > 0.0 {
         let circumradius = 2.0;
@@ -109,10 +109,9 @@ pub fn shoot_nearest_enemy(
             material_mesh_bundle,
             damage: attributes::Damage(10.0),
             circumradius: attributes::Circumradius(circumradius),
-            movement: attributes::Movement::new((enemy_position - player_position), 200.0),
+            movement: attributes::Movement::new(enemy_position - player_position, 200.0),
             marker: markers::Projectile,
             lifespan: attributes::LifeSpan(Timer::from_seconds(1.5, TimerMode::Once)),
-            ..default()
         });
     }
 }

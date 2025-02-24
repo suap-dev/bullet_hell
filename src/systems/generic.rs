@@ -30,5 +30,3 @@ pub fn death(
         }
     }
 }
-
-

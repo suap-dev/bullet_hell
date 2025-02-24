@@ -53,8 +53,9 @@ pub struct HitPoints(pub f32);
 #[derive(Component, Default)]
 pub struct LineOfSightRange(pub f32);
 
-#[derive(Component, Default)]
-pub struct Range(pub f32);
+// TODO: are we going to use this for anything?
+// #[derive(Component, Default)]
+// pub struct Range(pub f32);
 
 #[derive(Component, Default)]
 pub struct LifeSpan(pub Timer);
