@@ -3,10 +3,10 @@ use rand::Rng;
 use std::f32::consts::TAU;
 
 use crate::{
+    Borders,
     bundles::{self, ProtoSprite},
     components::{attributes, markers},
     config::ENEMIES_NUMBER,
-    Borders,
 };
 
 pub fn spawn(

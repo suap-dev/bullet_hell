@@ -2,7 +2,7 @@ use std::ops::Neg;
 
 use bevy::prelude::*;
 
-use crate::{components::attributes, config::FIX_AT_TELEPORT_EXIT, Borders};
+use crate::{Borders, components::attributes, config::FIX_AT_TELEPORT_EXIT};
 
 pub fn apply_velocity(time: Res<Time>, mut query: Query<(&mut Transform, &attributes::Movement)>) {
     for (mut transform, movement) in &mut query {

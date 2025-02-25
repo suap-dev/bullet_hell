@@ -92,7 +92,7 @@ pub fn shoot_nearest_enemy(
 ) {
     let player = player.single();
     let player_position = player.0.translation.xy();
-    let enemy_position = player.1 .0;
+    let enemy_position = player.1.0;
 
     if player_position.distance_squared(enemy_position) > 0.0 {
         let circumradius = 2.0;
