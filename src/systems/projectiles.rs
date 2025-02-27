@@ -38,7 +38,7 @@ pub fn deal_damage(
                     < (p_circumradius.0 + e_circumradius.0).powi(2)
             {
                 hitpoints.0 -= damage.0;
-                commands.entity(p_entity).despawn();
+                commands.entity(p_entity).try_despawn();
             }
         }
     }
