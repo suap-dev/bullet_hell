@@ -27,6 +27,7 @@ features = [
     "bevy_asset",
     "bevy_winit",
     "bevy_sprite",
+    "bevy_ui",
 
     # Optional features:
     # https://docs.rs/bevy/0.15.3/bevy/#optional-features

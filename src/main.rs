@@ -72,5 +72,7 @@ fn main() {
     )
     // generic
     .add_systems(Update, generic::death)
+    // ui
+    .add_systems(Startup, ui::spawn)
     .run();
 }
