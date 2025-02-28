@@ -3,6 +3,7 @@ mod components;
 mod config;
 mod systems;
 
+use avian2d::prelude::*;
 use bevy::{
     prelude::*,
     window::{EnabledButtons, WindowResolution},
@@ -49,18 +50,24 @@ fn main() {
         }),
         ..default()
     }))
+    .add_plugins(PhysicsPlugins::default())
+    //
     // level setup
     .add_systems(Startup, camera::setup)
+    //
     // player
     .add_systems(Startup, player::spawn)
     .add_systems(Update, player::movement_input)
     .add_systems(FixedUpdate, player::find_nearest_enemy)
     .add_systems(FixedUpdate, player::shoot_nearest_enemy)
+    //
     // enemies
     .add_systems(Startup, enemies::spawn)
     .add_systems(Update, enemies::player_seeking)
+    //
     // projectiles
-    .add_systems(Update, projectiles::deal_damage)
+    // .add_systems(Update, projectiles::deal_damage)
+    //
     // transforms
     .add_systems(
         Update,
@@ -70,9 +77,23 @@ fn main() {
             transform::teleport_at_borders,
         ),
     )
+    //
     // generic
     .add_systems(Update, generic::death)
+    //
     // ui
     .add_systems(Startup, ui::spawn)
+    //
+    // collisions
+    .add_systems(Update, print_collisions)
     .run();
+}
+
+fn print_collisions(mut collision_event_reader: EventReader<Collision>) {
+    for Collision(contacts) in collision_event_reader.read() {
+        println!(
+            "Entities {} and {} are colliding",
+            contacts.entity1, contacts.entity2,
+        );
+    }
 }

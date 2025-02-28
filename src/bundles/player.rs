@@ -1,16 +1,16 @@
-use bevy::{ecs::bundle::Bundle, sprite::Material2d, transform::components::Transform};
+use bevy::{ecs::bundle::Bundle, sprite::Material2d};
 
 use crate::{
-    bundles::ProtoSprite,
+    bundles,
     components::{attributes, markers},
 };
 
 #[derive(Bundle, Default)]
 pub struct Player<M: Material2d> {
-    pub marker: markers::Player,
-    pub sprite: ProtoSprite<M>,
-    pub transform: Transform,
-    pub collision_radius: attributes::CollisionRadius,
+    pub sprite: bundles::ProtoSprite<M>,
+    pub body: bundles::Body,
     pub movement: attributes::Movement,
     pub nearest_enemy: attributes::NearestEnemy,
+    //
+    pub marker: markers::Player,
 }

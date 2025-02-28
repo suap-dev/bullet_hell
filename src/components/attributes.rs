@@ -44,8 +44,10 @@ pub struct NearestEnemy(pub Vec2);
 #[derive(Component, Default)]
 pub struct AngularVelocity(pub f32);
 
-#[derive(Component, Default)]
-pub struct CollisionRadius(pub f32);
+#[derive(Component, Default, Clone, Copy)]
+pub struct Radius(pub f32);
+
+
 
 #[derive(Component, Default)]
 pub struct HitPoints(pub f32);

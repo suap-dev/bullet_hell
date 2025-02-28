@@ -1,10 +1,10 @@
+use avian2d::prelude::{Collider, CollisionLayers};
 use bevy::{math::vec2, prelude::*};
 use rand::Rng;
 use std::f32::consts::TAU;
 
 use crate::{
-    Borders,
-    bundles::{self, ProtoSprite},
+    Borders, bundles,
     components::{attributes, markers},
     config::ENEMIES_NUMBER,
 };
@@ -18,9 +18,10 @@ pub fn spawn(
     let mut rng = rand::rng();
 
     for _ in 0..ENEMIES_NUMBER {
-        let circumradius = attributes::CollisionRadius(rng.random_range(5.0..10.0));
-        let sprite = ProtoSprite {
-            mesh: Mesh2d(meshes.add(RegularPolygon::new(circumradius.0, rng.random_range(3..6)))),
+        let radius = rng.random_range(5.0..10.0);
+        // let radius = attributes::Radius(rng.random_range(5.0..10.0));
+        let sprite = bundles::ProtoSprite {
+            mesh: Mesh2d(meshes.add(RegularPolygon::new(radius, rng.random_range(3..6)))),
             material: MeshMaterial2d(materials.add(Color::srgb(
                 rng.random_range(0.4..0.6),
                 rng.random_range(0.1..0.2),
@@ -34,10 +35,16 @@ pub fn spawn(
         )
         .with_rotation(Quat::from_rotation_z(rng.random_range(0.0..TAU)));
 
-        commands.spawn(bundles::Enemy {
-            sprite,
+        let body = bundles::Body {
             transform,
-            collision_radius: circumradius,
+            radius: attributes::Radius(radius),
+            collider: Collider::circle(radius),
+            collision_layers: CollisionLayers::new(0b0001, 0b0010),
+        };
+
+        commands.spawn(bundles::Enemy {
+            body,
+            sprite,
             movement: attributes::Movement::from_velocity(vec2(
                 rng.random_range(-20.0..20.0),
                 rng.random_range(-20.0..20.0),

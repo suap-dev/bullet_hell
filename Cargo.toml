@@ -17,6 +17,11 @@ resolver = "2" # Important! wgpu/Bevy needs this!
 [dependencies]
 rand = "0.9.0"
 
+[dependencies.avian2d]
+version = "0.2.1"
+default-features = false
+features = ["2d", "parry-f32", "parallel", "simd"]
+
 [dependencies.bevy]
 version = "0.15.3"
 default-features = false
@@ -39,7 +44,7 @@ lto = true      # link time optimizations
 opt-level = "s"
 
 [profile.dev]
-opt-level = 1
+opt-level = 0
 
 # Dependencies, including Bevy
 [profile.dev.package."*"]

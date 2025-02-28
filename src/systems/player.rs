@@ -1,7 +1,8 @@
+use avian2d::prelude::{Collider, CollisionLayers};
 use bevy::{math::vec2, prelude::*};
 
 use crate::{
-    bundles::{self, ProtoSprite},
+    bundles,
     components::{attributes, markers},
 };
 
@@ -10,17 +11,23 @@ pub fn spawn(
     mut meshes: ResMut<Assets<Mesh>>,
     mut materials: ResMut<Assets<ColorMaterial>>,
 ) {
-    let circumradius = 6.0;
+    let radius = 6.0;
 
-    let sprite = ProtoSprite {
-        mesh: Mesh2d(meshes.add(Circle::new(circumradius))),
+    let sprite = bundles::ProtoSprite {
+        mesh: Mesh2d(meshes.add(Circle::new(radius))),
         material: MeshMaterial2d(materials.add(Color::srgb(0.0, 0.8, 0.6))),
+    };
+
+    let body = bundles::Body {
+        transform: Transform::from_xyz(0.0, 0.0, -2.0),
+        radius: attributes::Radius(radius),
+        collider: Collider::circle(radius),
+        collision_layers: CollisionLayers::from_bits(0b1000, 0b1000),
     };
 
     commands.spawn(bundles::Player {
         sprite,
-        transform: Transform::from_xyz(0.0, 0.0, -2.0),
-        collision_radius: attributes::CollisionRadius(circumradius),
+        body,
         movement: attributes::Movement::from_max_speed(80.0),
         ..default()
     });
@@ -95,21 +102,23 @@ pub fn shoot_nearest_enemy(
     let enemy_position = player.1.0;
 
     if player_position.distance_squared(enemy_position) > 0.0 {
-        let circumradius = 2.0;
-
-        let sprite = ProtoSprite {
-            mesh: Mesh2d(meshes.add(Circle::new(circumradius))),
-            material: MeshMaterial2d(materials.add(Color::srgb(0.6, 1.0, 0.0))),
-        };
+        let radius = 2.0;
 
         commands.spawn(bundles::Projectile {
             damage: attributes::Damage(10.0),
-            sprite,
-            transform: Transform::from_translation(player_position.extend(-1.0)),
-            collision_radius: attributes::CollisionRadius(circumradius),
+            sprite: bundles::ProtoSprite {
+                mesh: Mesh2d(meshes.add(Circle::new(radius))),
+                material: MeshMaterial2d(materials.add(Color::srgb(0.6, 1.0, 0.0))),
+            },
+            body: bundles::Body {
+                transform: Transform::from_translation(player_position.extend(-1.0)),
+                radius: attributes::Radius(radius),
+                collider: Collider::circle(radius),
+                collision_layers: CollisionLayers::new(2, 1),
+            },
             movement: attributes::Movement::new(enemy_position - player_position, 200.0),
-            marker: markers::Projectile,
             lifespan: attributes::LifeSpan(Timer::from_seconds(1.5, TimerMode::Once)),
+            ..default()
         });
     }
 }

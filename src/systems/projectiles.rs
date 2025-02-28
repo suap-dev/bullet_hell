@@ -12,20 +12,11 @@ use crate::components::{attributes, markers};
 pub fn deal_damage(
     mut commands: Commands,
     projectiles: Query<
-        (
-            Entity,
-            &Transform,
-            &attributes::CollisionRadius,
-            &attributes::Damage,
-        ),
+        (Entity, &Transform, &attributes::Radius, &attributes::Damage),
         With<markers::Projectile>,
     >,
     mut enemies: Query<
-        (
-            &Transform,
-            &attributes::CollisionRadius,
-            &mut attributes::HitPoints,
-        ),
+        (&Transform, &attributes::Radius, &mut attributes::HitPoints),
         With<markers::Enemy>,
     >,
 ) {
