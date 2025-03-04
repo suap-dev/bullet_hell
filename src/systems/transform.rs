@@ -2,7 +2,7 @@ use std::ops::Neg;
 
 use bevy::prelude::*;
 
-use crate::{Borders, components::attributes, config::FIX_AT_TELEPORT_EXIT};
+use crate::{components::attributes, config, resources};
 
 pub fn apply_velocity(time: Res<Time>, mut query: Query<(&mut Transform, &attributes::Movement)>) {
     for (mut transform, movement) in &mut query {
@@ -10,7 +10,7 @@ pub fn apply_velocity(time: Res<Time>, mut query: Query<(&mut Transform, &attrib
     }
 }
 
-// TODO: not sure if we want this to randomly rotate all the time. maybe some more situation based rotation?
+// TODO: this is a temporary animation
 pub fn apply_angular_velocity(
     time: Res<Time>,
     mut query: Query<(&mut Transform, &attributes::AngularVelocity)>,
@@ -24,7 +24,7 @@ pub fn apply_angular_velocity(
 
 pub fn teleport_at_borders(
     // window: Query<&Window>,
-    borders: Res<Borders>,
+    borders: Res<resources::Borders>,
     mut query: Query<(&mut Transform, &attributes::Radius)>,
 ) {
     for (mut transform, circumradius) in &mut query {
@@ -32,13 +32,13 @@ pub fn teleport_at_borders(
             &mut transform.translation.x,
             borders.left - circumradius.0,
             borders.right + circumradius.0,
-            FIX_AT_TELEPORT_EXIT,
+            config::BORDER_TELEPORT_CORRECTION,
         );
         cycle_coords(
             &mut transform.translation.y,
             borders.bottom - circumradius.0,
             borders.top + circumradius.0,
-            FIX_AT_TELEPORT_EXIT,
+            config::BORDER_TELEPORT_CORRECTION,
         );
     }
 }

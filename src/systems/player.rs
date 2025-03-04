@@ -1,9 +1,10 @@
-use avian2d::prelude::{Collider, CollisionLayers};
+use avian2d::prelude::{Collider, CollisionLayers, CollisionMargin};
 use bevy::{math::vec2, prelude::*};
 
 use crate::{
     bundles,
     components::{attributes, markers},
+    config, resources,
 };
 
 pub fn spawn(
@@ -23,6 +24,7 @@ pub fn spawn(
         radius: attributes::Radius(radius),
         collider: Collider::circle(radius),
         collision_layers: CollisionLayers::from_bits(0b1000, 0b1000),
+        collision_margin: CollisionMargin(radius * config::DEFAULT_COLLISION_MARGIN_RATIO),
     };
 
     commands.spawn(bundles::Player {
@@ -33,7 +35,7 @@ pub fn spawn(
     });
 }
 
-pub fn movement_input(
+pub fn handle_input(
     mut player: Query<&mut attributes::Movement, With<markers::Player>>,
     keyboard_input: Res<ButtonInput<KeyCode>>,
 ) {
@@ -65,8 +67,8 @@ pub fn movement_input(
     player.single_mut().set_direction(direction);
 }
 
-pub fn find_nearest_enemy(
-    mut player: Query<(&Transform, &mut attributes::NearestEnemy), With<markers::Player>>,
+pub fn target_closest_enemy(
+    mut player: Query<(&Transform, &mut attributes::Target), With<markers::Player>>,
     enemies: Query<&Transform, With<markers::Enemy>>,
 ) {
     let (transform, mut nearest_enemy) = player.single_mut();
@@ -88,37 +90,44 @@ pub fn find_nearest_enemy(
         }
     }
 
-    *nearest_enemy = attributes::NearestEnemy(nearest_enemy_position);
+    *nearest_enemy = attributes::Target(nearest_enemy_position);
 }
 
-pub fn shoot_nearest_enemy(
-    player: Query<(&Transform, &attributes::NearestEnemy), With<markers::Player>>,
+pub fn shoot_target(
+    player: Query<(&Transform, &attributes::Target), With<markers::Player>>,
     mut commands: Commands,
     mut meshes: ResMut<Assets<Mesh>>,
     mut materials: ResMut<Assets<ColorMaterial>>,
+    time: Res<Time>,
+    mut cooldown: ResMut<resources::ShootCooldown>,
 ) {
-    let player = player.single();
-    let player_position = player.0.translation.xy();
-    let enemy_position = player.1.0;
+    if cooldown.0.tick(time.delta()).finished() {
+        let player = player.single();
+        let player_position = player.0.translation.xy();
+        let enemy_position = player.1.0;
 
-    if player_position.distance_squared(enemy_position) > 0.0 {
-        let radius = 2.0;
+        if player_position.distance_squared(enemy_position) > 0.0 {
+            let radius = 2.0;
 
-        commands.spawn(bundles::Projectile {
-            damage: attributes::Damage(10.0),
-            sprite: bundles::ProtoSprite {
-                mesh: Mesh2d(meshes.add(Circle::new(radius))),
-                material: MeshMaterial2d(materials.add(Color::srgb(0.6, 1.0, 0.0))),
-            },
-            body: bundles::Body {
-                transform: Transform::from_translation(player_position.extend(-1.0)),
-                radius: attributes::Radius(radius),
-                collider: Collider::circle(radius),
-                collision_layers: CollisionLayers::new(2, 1),
-            },
-            movement: attributes::Movement::new(enemy_position - player_position, 200.0),
-            lifespan: attributes::LifeSpan(Timer::from_seconds(1.5, TimerMode::Once)),
-            ..default()
-        });
+            commands.spawn(bundles::Projectile {
+                damage: attributes::Damage(10.0),
+                sprite: bundles::ProtoSprite {
+                    mesh: Mesh2d(meshes.add(Circle::new(radius))),
+                    material: MeshMaterial2d(materials.add(Color::srgb(0.6, 1.0, 0.0))),
+                },
+                body: bundles::Body {
+                    transform: Transform::from_translation(player_position.extend(-1.0)),
+                    radius: attributes::Radius(radius),
+                    collider: Collider::circle(radius),
+                    collision_layers: CollisionLayers::new(2, 1),
+                    collision_margin: CollisionMargin(
+                        radius * config::DEFAULT_COLLISION_MARGIN_RATIO,
+                    ),
+                },
+                movement: attributes::Movement::new(enemy_position - player_position, 200.0),
+                lifespan: attributes::LifeSpan(Timer::from_seconds(1.5, TimerMode::Once)),
+                ..default()
+            });
+        }
     }
 }

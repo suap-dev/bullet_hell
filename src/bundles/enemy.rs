@@ -10,8 +10,8 @@ pub struct Enemy<M: Material2d> {
     pub sprite: bundles::ProtoSprite<M>,
     pub body: bundles::Body,
     pub movement: attributes::Movement,
-    pub hitpoints: attributes::HitPoints,
-    pub los_range: attributes::LineOfSightRange,
+    pub hitpoints: attributes::Hitpoints,
+    pub los_range: attributes::SightRange,
     pub angular_velocity: attributes::AngularVelocity,
     //
     pub marker: markers::Enemy,

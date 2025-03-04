@@ -1,23 +1,23 @@
-use avian2d::prelude::{Collider, CollisionLayers};
+use avian2d::prelude::{Collider, CollisionLayers, CollisionMargin};
 use bevy::{math::vec2, prelude::*};
 use rand::Rng;
 use std::f32::consts::TAU;
 
 use crate::{
-    Borders, bundles,
+    bundles,
     components::{attributes, markers},
-    config::ENEMIES_NUMBER,
+    config, resources,
 };
 
 pub fn spawn(
     mut commands: Commands,
     mut meshes: ResMut<Assets<Mesh>>,
     mut materials: ResMut<Assets<ColorMaterial>>,
-    borders: Res<Borders>,
+    borders: Res<resources::Borders>,
 ) {
     let mut rng = rand::rng();
 
-    for _ in 0..ENEMIES_NUMBER {
+    for _ in 0..config::ENEMY_COUNT {
         let radius = rng.random_range(5.0..10.0);
         // let radius = attributes::Radius(rng.random_range(5.0..10.0));
         let sprite = bundles::ProtoSprite {
@@ -40,6 +40,7 @@ pub fn spawn(
             radius: attributes::Radius(radius),
             collider: Collider::circle(radius),
             collision_layers: CollisionLayers::new(0b0001, 0b0010),
+            collision_margin: CollisionMargin(radius * config::DEFAULT_COLLISION_MARGIN_RATIO),
         };
 
         commands.spawn(bundles::Enemy {
@@ -49,20 +50,20 @@ pub fn spawn(
                 rng.random_range(-20.0..20.0),
                 rng.random_range(-20.0..20.0),
             )),
-            hitpoints: attributes::HitPoints(rng.random_range(9.0..=40.0)),
-            los_range: attributes::LineOfSightRange(rng.random_range(100.0..300.0)),
+            hitpoints: attributes::Hitpoints(rng.random_range(9.0..=40.0)),
+            los_range: attributes::SightRange(rng.random_range(100.0..300.0)),
             angular_velocity: attributes::AngularVelocity(rng.random_range(-2.0..2.0)),
             ..default()
         });
     }
 }
 
-pub fn player_seeking(
+pub fn seek_and_follow_player(
     mut query: Query<
         (
             &mut attributes::Movement,
             &Transform,
-            &attributes::LineOfSightRange,
+            &attributes::SightRange,
         ),
         With<markers::Enemy>,
     >,

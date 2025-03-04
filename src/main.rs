@@ -1,6 +1,7 @@
 mod bundles;
 mod components;
 mod config;
+mod resources;
 mod systems;
 
 use avian2d::prelude::*;
@@ -8,39 +9,33 @@ use bevy::{
     prelude::*,
     window::{EnabledButtons, WindowResolution},
 };
-use config::{LOGICAL_HEIGHT, LOGICAL_WIDTH};
 
 #[allow(clippy::wildcard_imports)]
 use crate::systems::*;
 
-#[derive(Resource)]
-struct Borders {
-    pub top: f32,
-    pub bottom: f32,
-    pub right: f32,
-    pub left: f32,
-}
-
 fn main() {
-    let mut app = App::new();
+    let mut game = App::new();
 
-    app.insert_resource(Borders {
-        top: LOGICAL_HEIGHT / 2.0,
-        bottom: -LOGICAL_HEIGHT / 2.0,
-        right: LOGICAL_WIDTH / 2.0,
-        left: -LOGICAL_WIDTH / 2.0,
-    })
-    .insert_resource(Time::<Fixed>::from_hz(6.0));
+    //== RESOURCES ==//
+    game.insert_resource(Time::<Fixed>::from_hz(config::FIXED_UPDATE_HZ))
+        .insert_resource(resources::Borders {
+            top: config::WINDOW_LOGICAL_HEIGHT / 2.0,
+            bottom: -config::WINDOW_LOGICAL_HEIGHT / 2.0,
+            right: config::WINDOW_LOGICAL_WIDTH / 2.0,
+            left: -config::WINDOW_LOGICAL_WIDTH / 2.0,
+        })
+        .insert_resource(resources::ShootCooldown(Timer::from_seconds(
+            config::SHOOT_COOLDOWN,
+            TimerMode::Repeating,
+        )));
 
-    #[cfg(debug_assertions)]
-    {
-        use bevy::diagnostic::{FrameTimeDiagnosticsPlugin, LogDiagnosticsPlugin};
-        app.add_plugins((LogDiagnosticsPlugin::default(), FrameTimeDiagnosticsPlugin));
-    }
-
-    app.add_plugins(DefaultPlugins.set(WindowPlugin {
+    //== PLUGINS ==//
+    game.add_plugins(DefaultPlugins.set(WindowPlugin {
         primary_window: Some(Window {
-            resolution: WindowResolution::new(LOGICAL_WIDTH, LOGICAL_HEIGHT),
+            resolution: WindowResolution::new(
+                config::WINDOW_LOGICAL_WIDTH,
+                config::WINDOW_LOGICAL_HEIGHT,
+            ),
             resizable: false,
             enabled_buttons: EnabledButtons {
                 maximize: false,
@@ -50,50 +45,44 @@ fn main() {
         }),
         ..default()
     }))
-    .add_plugins(PhysicsPlugins::default())
-    //
-    // level setup
-    .add_systems(Startup, camera::setup)
-    //
-    // player
-    .add_systems(Startup, player::spawn)
-    .add_systems(Update, player::movement_input)
-    .add_systems(FixedUpdate, player::find_nearest_enemy)
-    .add_systems(FixedUpdate, player::shoot_nearest_enemy)
-    //
-    // enemies
-    .add_systems(Startup, enemies::spawn)
-    .add_systems(Update, enemies::player_seeking)
-    //
-    // projectiles
-    // .add_systems(Update, projectiles::deal_damage)
-    //
-    // transforms
-    .add_systems(
-        Update,
-        (
-            transform::apply_velocity,
-            transform::apply_angular_velocity,
-            transform::teleport_at_borders,
-        ),
-    )
-    //
-    // generic
-    .add_systems(Update, generic::death)
-    //
-    // ui
-    .add_systems(Startup, ui::spawn)
-    //
-    // collisions
-    .add_systems(Update, print_collisions)
-    .run();
-}
+    .add_plugins(PhysicsPlugins::default());
 
-fn print_collisions(mut collision_event_reader: EventReader<Collision>) {
-    for Collision(contacts) in collision_event_reader.read() {
-        println!(
-            "Entities {} and {} are colliding",
-            contacts.entity1, contacts.entity2,
-        );
+    #[cfg(debug_assertions)]
+    {
+        use bevy::diagnostic::{FrameTimeDiagnosticsPlugin, LogDiagnosticsPlugin};
+        game.add_plugins((LogDiagnosticsPlugin::default(), FrameTimeDiagnosticsPlugin));
     }
+
+    //== SYSTEMS ==//
+    game
+        //= level setup =//
+        .add_systems(Startup, camera::setup)
+        //= player =//
+        .add_systems(Startup, player::spawn)
+        .add_systems(Update, player::handle_input)
+        .add_systems(Update, player::target_closest_enemy)
+        .add_systems(Update, player::shoot_target)
+        //= enemies =//
+        .add_systems(Startup, enemies::spawn)
+        .add_systems(Update, enemies::seek_and_follow_player)
+        //= projectiles =//
+        // .add_systems(Update, projectiles::deal_damage)
+        .add_systems(FixedUpdate, projectiles::hit_and_damage_enemy)
+        //= transforms =//
+        .add_systems(
+            Update,
+            (
+                transform::apply_velocity,
+                transform::apply_angular_velocity,
+                transform::teleport_at_borders,
+            ),
+        )
+        //= generic =//
+        .add_systems(Update, death)
+        //= ui =//
+        .add_systems(Startup, ui::spawn);
+    //= collisions =//
+
+    //== LET'S GO! ==//
+    game.run();
 }
