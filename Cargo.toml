@@ -31,7 +31,7 @@ features = [
     "bevy_winit",
     "bevy_sprite",
     "bevy_ui",
-    # "default_font",
+    "default_font",
 
     # Optional features:
     # https://docs.rs/bevy/0.15.3/bevy/#optional-features

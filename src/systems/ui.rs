@@ -1,8 +1,10 @@
 use bevy::{
     color::palettes::tailwind,
+    diagnostic::{DiagnosticsStore, FrameTimeDiagnosticsPlugin},
     prelude::*,
 };
 
+use crate::components::markers::{self, FpsCounter};
 
 pub fn spawn(mut commands: Commands) {
     let border = commands
@@ -41,4 +43,23 @@ pub fn spawn(mut commands: Commands) {
         .id();
 
     commands.entity(border).add_child(bar);
+    commands.spawn((
+        markers::FpsCounter,
+        Text::new("Hello."),
+        Node {
+            margin: UiRect::all(Val::Px(10.)),
+            ..default()
+        },
+    ));
+}
+
+pub fn fps_counter(
+    diagnostics: Res<DiagnosticsStore>,
+    mut fps_text_query: Query<&mut Text, With<FpsCounter>>,
+) {
+    if let Some(fps_diagnostic) = diagnostics.get(&FrameTimeDiagnosticsPlugin::FPS) {
+        if let Some(fps_val) = fps_diagnostic.smoothed() {
+            **fps_text_query.single_mut() = format!("{fps_val:.0}");
+        }
+    }
 }

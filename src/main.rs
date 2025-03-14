@@ -6,6 +6,7 @@ mod resources;
 mod systems;
 
 use bevy::{
+    diagnostic::{Diagnostic, FrameTimeDiagnosticsPlugin, RegisterDiagnostic},
     prelude::*,
 };
 
@@ -18,7 +19,11 @@ fn main() {
     game.insert_resource(resources::Borders::default())
         .insert_resource(resources::ShootCooldown::default());
 
-    game.add_plugins(plugins::GamePlugins);
+    game.add_plugins(plugins::GamePlugins)
+        .add_plugins(FrameTimeDiagnosticsPlugin)
+        .register_diagnostic(
+            Diagnostic::new(FrameTimeDiagnosticsPlugin::FPS).with_smoothing_factor(0.5),
+        );
 
     //== SYSTEMS ==//
     game
@@ -47,7 +52,8 @@ fn main() {
         //= generic =//
         .add_systems(Update, death)
         //= ui =//
-        .add_systems(Startup, ui::spawn);
+        .add_systems(Startup, ui::spawn)
+        .add_systems(Update, ui::fps_counter);
     //= collisions =//
 
     //== LET'S GO! ==//
