@@ -8,4 +8,12 @@ pub const ENEMY_COUNT: usize = 100;
 pub const DEFAULT_COLLISION_MARGIN_RATIO: f32 = 0.1;
 pub const SHOOT_COOLDOWN: f32 = 0.1;
 
-pub const FIXED_UPDATE_HZ: f64 = 60.;
+// "The default timestep() is 64 hertz, or 15625 microseconds
+// This value was chosen because using 60 hertz has the
+// potential for a pathological interaction with the monitor
+// refresh rate where the game alternates between running two
+// fixed timesteps and zero fixed timesteps per frame (for
+// example when running two fixed timesteps takes longer than
+// a frame). Additionally, the value is a power of two which
+// losslessly converts into f32 and f64.""
+// source: https://docs.rs/bevy/latest/bevy/time/struct.Fixed.html

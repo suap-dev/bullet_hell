@@ -1,4 +1,8 @@
-use bevy::{color::palettes::tailwind, prelude::*};
+use bevy::{
+    color::palettes::tailwind,
+    prelude::*,
+};
+
 
 pub fn spawn(mut commands: Commands) {
     let border = commands

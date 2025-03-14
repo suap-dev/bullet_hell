@@ -1,13 +1,12 @@
 mod bundles;
 mod components;
 mod config;
+mod plugins;
 mod resources;
 mod systems;
 
-use avian2d::prelude::*;
 use bevy::{
     prelude::*,
-    window::{EnabledButtons, WindowResolution},
 };
 
 #[allow(clippy::wildcard_imports)]
@@ -16,42 +15,10 @@ use crate::systems::*;
 fn main() {
     let mut game = App::new();
 
-    //== RESOURCES ==//
-    game.insert_resource(Time::<Fixed>::from_hz(config::FIXED_UPDATE_HZ))
-        .insert_resource(resources::Borders {
-            top: config::WINDOW_LOGICAL_HEIGHT / 2.0,
-            bottom: -config::WINDOW_LOGICAL_HEIGHT / 2.0,
-            right: config::WINDOW_LOGICAL_WIDTH / 2.0,
-            left: -config::WINDOW_LOGICAL_WIDTH / 2.0,
-        })
-        .insert_resource(resources::ShootCooldown(Timer::from_seconds(
-            config::SHOOT_COOLDOWN,
-            TimerMode::Repeating,
-        )));
+    game.insert_resource(resources::Borders::default())
+        .insert_resource(resources::ShootCooldown::default());
 
-    //== PLUGINS ==//
-    game.add_plugins(DefaultPlugins.set(WindowPlugin {
-        primary_window: Some(Window {
-            resolution: WindowResolution::new(
-                config::WINDOW_LOGICAL_WIDTH,
-                config::WINDOW_LOGICAL_HEIGHT,
-            ),
-            resizable: false,
-            enabled_buttons: EnabledButtons {
-                maximize: false,
-                ..default()
-            },
-            ..default()
-        }),
-        ..default()
-    }))
-    .add_plugins(PhysicsPlugins::default());
-
-    #[cfg(debug_assertions)]
-    {
-        use bevy::diagnostic::{FrameTimeDiagnosticsPlugin, LogDiagnosticsPlugin};
-        game.add_plugins((LogDiagnosticsPlugin::default(), FrameTimeDiagnosticsPlugin));
-    }
+    game.add_plugins(plugins::GamePlugins);
 
     //== SYSTEMS ==//
     game

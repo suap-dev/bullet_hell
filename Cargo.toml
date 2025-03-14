@@ -5,8 +5,6 @@ edition = "2024"
 
 [lints.clippy]
 all = "warn"
-pedantic = "warn"
-nursery = "warn"
 needless_pass_by_value = { level = "allow", priority = 1 }
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
@@ -33,6 +31,7 @@ features = [
     "bevy_winit",
     "bevy_sprite",
     "bevy_ui",
+    # "default_font",
 
     # Optional features:
     # https://docs.rs/bevy/0.15.3/bevy/#optional-features
