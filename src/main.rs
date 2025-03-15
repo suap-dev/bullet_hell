@@ -41,6 +41,7 @@ fn main() {
             transforms::apply_velocity,
             transforms::apply_angular_velocity,
             transforms::teleport_at_borders,
+            death,
         ),
     );
 
