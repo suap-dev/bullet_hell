@@ -2,7 +2,7 @@ pub mod camera;
 pub mod enemies;
 pub mod player;
 pub mod projectiles;
-pub mod transform;
+pub mod transforms;
 pub mod ui;
 
 use bevy::prelude::*;
