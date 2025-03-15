@@ -102,11 +102,10 @@ pub fn shoot_target(
     mut cooldown: ResMut<resources::ShootCooldown>,
 ) {
     if cooldown.0.tick(time.delta()).finished() {
-        let player = player.single();
-        let player_position = player.0.translation.xy();
-        let enemy_position = player.1.0;
+        let (&player_transform, &attributes::Target(target_position)) = player.single();
+        let player_position = player_transform.translation.xy();
 
-        if player_position.distance_squared(enemy_position) > 0.0 {
+        if player_position.distance_squared(target_position) > 0.0 {
             let radius = 2.0;
 
             commands.spawn(bundles::Projectile {
@@ -116,7 +115,9 @@ pub fn shoot_target(
                     material: MeshMaterial2d(materials.add(Color::srgb(0.6, 1.0, 0.0))),
                 },
                 body: bundles::Body {
-                    transform: Transform::from_translation(player_position.extend(-1.0)),
+                    transform: Transform::from_translation(
+                        player_transform.translation - Vec3::new(0., 0., 1.0),
+                    ),
                     radius: attributes::Radius(radius),
                     collider: Collider::circle(radius),
                     collision_layers: CollisionLayers::new(2, 1),
@@ -124,7 +125,7 @@ pub fn shoot_target(
                         radius * config::DEFAULT_COLLISION_MARGIN_RATIO,
                     ),
                 },
-                movement: attributes::Movement::new(enemy_position - player_position, 200.0),
+                movement: attributes::Movement::new(target_position - player_position, 200.0),
                 lifespan: attributes::LifeSpan(Timer::from_seconds(1.5, TimerMode::Once)),
                 ..default()
             });
