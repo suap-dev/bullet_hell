@@ -30,17 +30,18 @@ fn main() {
         Startup,
         (camera::setup, ui::spawn, player::spawn, enemies::spawn),
     )
-    .add_systems(FixedUpdate, projectiles::hit_and_damage_enemy)
     .add_systems(
         Update,
         (
             player::handle_input,
             player::target_closest_enemy,
             player::shoot_target,
+            projectiles::hit_and_damage_enemy,
             enemies::seek_and_follow_player,
             transforms::apply_velocity,
             transforms::apply_angular_velocity,
             transforms::teleport_at_borders,
+            ui::fps_counter,
             death,
         ),
     );
