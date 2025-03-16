@@ -1,5 +1,8 @@
-pub mod movement;
-pub use movement::*;
+mod hitpoints;
+mod movement;
+
+pub use hitpoints::Hitpoints;
+pub use movement::Movement;
 
 use bevy::{ecs::component::Component, math::Vec2, time::Timer};
 
@@ -11,9 +14,6 @@ pub struct AngularVelocity(pub f32);
 
 #[derive(Component, Default, Clone, Copy)]
 pub struct Radius(pub f32);
-
-#[derive(Component, Default)]
-pub struct Hitpoints(pub f32);
 
 #[derive(Component, Default)]
 pub struct SightRange(pub f32);

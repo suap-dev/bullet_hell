@@ -42,7 +42,7 @@ pub fn spawn(
             collision_layers: CollisionLayers::new(0b0001, 0b0010),
             collision_margin: CollisionMargin(radius * config::DEFAULT_COLLISION_MARGIN_RATIO),
         };
-
+        
         commands.spawn(bundles::Enemy {
             body,
             sprite,
@@ -50,7 +50,7 @@ pub fn spawn(
                 rng.random_range(-20.0..20.0),
                 rng.random_range(-20.0..20.0),
             )),
-            hitpoints: attributes::Hitpoints(rng.random_range(9.0..=40.0)),
+            hitpoints: attributes::Hitpoints::from_max(rng.random_range(9.0..=40.0)),
             los_range: attributes::SightRange(rng.random_range(100.0..300.0)),
             angular_velocity: attributes::AngularVelocity(rng.random_range(-2.0..2.0)),
             ..default()

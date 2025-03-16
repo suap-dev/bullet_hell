@@ -17,13 +17,13 @@ pub fn hit_and_damage_enemy(
             projectile_damage.get(entity1),
             enemy_hitpoints.get_mut(entity2),
         ) {
-            hp.0 -= damage.0;
+            hp.damage(damage.0);
             commands.entity(entity1).try_despawn();
         } else if let (Ok(damage), Ok(mut hp)) = (
             projectile_damage.get(entity2),
             enemy_hitpoints.get_mut(entity1),
         ) {
-            hp.0 -= damage.0;
+            hp.damage(damage.0);
             commands.entity(entity2).try_despawn();
         }
     }

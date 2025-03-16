@@ -25,7 +25,7 @@ pub fn death(
     }
     for (entity, hitpoints) in &with_hitpoints {
         if let Some(mut e) = commands.get_entity(entity) {
-            if hitpoints.0 <= 0.0 {
+            if hitpoints.current() <= 0.0 {
                 e.despawn();
             }
         }
