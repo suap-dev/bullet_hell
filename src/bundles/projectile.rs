@@ -5,7 +5,7 @@ use crate::{
     components::{attributes, markers},
 };
 
-#[derive(Bundle, Default)]
+#[derive(Bundle)]
 pub struct Projectile<M: Material2d> {
     pub sprite: bundles::ProtoSprite<M>,
     pub body: bundles::Body,

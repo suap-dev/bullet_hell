@@ -11,3 +11,6 @@ pub struct Projectile;
 
 #[derive(Component, Default)]
 pub struct FpsCounter;
+
+#[derive(Component)]
+pub struct PlayerHealthbar;

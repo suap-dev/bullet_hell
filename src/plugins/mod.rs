@@ -23,6 +23,7 @@ impl PluginGroup for GamePlugins {
                         maximize: false,
                         ..default()
                     },
+                    position: WindowPosition::At(IVec2::new(5, 15)),
                     ..default()
                 }),
                 ..default()

@@ -36,15 +36,17 @@ fn main() {
             player::handle_input,
             player::target_closest_enemy,
             player::shoot_target,
+            // player::report_hp,
             projectiles::hit_and_damage_enemy,
             enemies::seek_and_follow_player,
+            enemies::hit_and_damage_player,
             transforms::apply_velocity,
             transforms::apply_angular_velocity,
             transforms::teleport_at_borders,
-            ui::fps_counter,
             death,
         ),
-    );
+    )
+    .add_systems(PostUpdate, (ui::fps_counter, ui::player_healthbar));
 
     game.run();
 }

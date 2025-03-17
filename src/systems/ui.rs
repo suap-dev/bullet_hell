@@ -4,7 +4,7 @@ use bevy::{
     prelude::*,
 };
 
-use crate::components::markers::{self, FpsCounter};
+use crate::components::{attributes, markers};
 
 pub fn spawn(mut commands: Commands) {
     let border = commands
@@ -32,6 +32,7 @@ pub fn spawn(mut commands: Commands) {
 
     let bar = commands
         .spawn((
+            markers::PlayerHealthbar,
             Node {
                 width: Val::Percent(100.),
                 height: Val::Percent(100.),
@@ -55,11 +56,30 @@ pub fn spawn(mut commands: Commands) {
 
 pub fn fps_counter(
     diagnostics: Res<DiagnosticsStore>,
-    mut fps_text_query: Query<&mut Text, With<FpsCounter>>,
+    mut fps_text_query: Query<&mut Text, With<markers::FpsCounter>>,
 ) {
     if let Some(fps_diagnostic) = diagnostics.get(&FrameTimeDiagnosticsPlugin::FPS) {
         if let Some(fps_val) = fps_diagnostic.smoothed() {
             **fps_text_query.single_mut() = format!("{fps_val:.0}");
+        }
+    }
+}
+
+// TODO: consider using events here; will it even be better?
+// if enemy deals damage to the player we can send an event;
+// but we still need a system that will handle the event.
+// at this moment we calculate the change of hp first
+// and post-update we change the value of UI node.
+pub fn player_healthbar(
+    player_hp: Query<
+        &attributes::Hitpoints,
+        (With<markers::Player>, Changed<attributes::Hitpoints>),
+    >,
+    mut hp_bar: Query<&mut Node, With<markers::PlayerHealthbar>>,
+) {
+    if let Ok(hitpoints) = player_hp.get_single() {
+        if let Ok(mut bar_node) = hp_bar.get_single_mut() {
+            bar_node.width = Val::Percent(100. * hitpoints.current() / hitpoints.max());
         }
     }
 }

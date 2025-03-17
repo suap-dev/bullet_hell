@@ -23,7 +23,7 @@ pub fn spawn(
         transform: Transform::from_xyz(0.0, 0.0, -2.0),
         radius: attributes::Radius(radius),
         collider: Collider::circle(radius),
-        collision_layers: CollisionLayers::from_bits(0b1000, 0b1000),
+        collision_layers: CollisionLayers::from_bits(0b0100, 0b0001),
         collision_margin: CollisionMargin(radius * config::DEFAULT_COLLISION_MARGIN_RATIO),
     };
 
@@ -31,7 +31,9 @@ pub fn spawn(
         sprite,
         body,
         movement: attributes::Movement::from_max_speed(80.0),
-        ..default()
+        nearest_enemy: attributes::Target::default(),
+        marker: markers::Player,
+        hitpoints: attributes::Hitpoints::from_max(100.),
     });
 }
 
@@ -93,6 +95,7 @@ pub fn target_closest_enemy(
     *nearest_enemy = attributes::Target(nearest_enemy_position);
 }
 
+// TODO: move projectile logic out of players module
 pub fn shoot_target(
     player: Query<(&Transform, &attributes::Target), With<markers::Player>>,
     mut commands: Commands,
@@ -120,15 +123,23 @@ pub fn shoot_target(
                     ),
                     radius: attributes::Radius(radius),
                     collider: Collider::circle(radius),
-                    collision_layers: CollisionLayers::new(2, 1),
+                    collision_layers: CollisionLayers::new(0b0010, 0b0001),
                     collision_margin: CollisionMargin(
                         radius * config::DEFAULT_COLLISION_MARGIN_RATIO,
                     ),
                 },
                 movement: attributes::Movement::new(target_position - player_position, 200.0),
                 lifespan: attributes::LifeSpan(Timer::from_seconds(1.5, TimerMode::Once)),
-                ..default()
+                marker: markers::Projectile,
             });
         }
+    }
+}
+
+pub fn log_hp(
+    player: Query<&attributes::Hitpoints, (With<markers::Player>, Changed<attributes::Hitpoints>)>,
+) {
+    if let Ok(hitpoints) = player.get_single() {
+        println!("{}", hitpoints.current());
     }
 }

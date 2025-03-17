@@ -1,4 +1,4 @@
-use avian2d::prelude::{Collider, CollisionLayers, CollisionMargin};
+use avian2d::prelude::{Collider, Collision, CollisionLayers, CollisionMargin};
 use bevy::{math::vec2, prelude::*};
 use rand::Rng;
 use std::f32::consts::TAU;
@@ -39,10 +39,10 @@ pub fn spawn(
             transform,
             radius: attributes::Radius(radius),
             collider: Collider::circle(radius),
-            collision_layers: CollisionLayers::new(0b0001, 0b0010),
+            collision_layers: CollisionLayers::new(0b0001, 0b0110),
             collision_margin: CollisionMargin(radius * config::DEFAULT_COLLISION_MARGIN_RATIO),
         };
-        
+
         commands.spawn(bundles::Enemy {
             body,
             sprite,
@@ -53,7 +53,8 @@ pub fn spawn(
             hitpoints: attributes::Hitpoints::from_max(rng.random_range(9.0..=40.0)),
             los_range: attributes::SightRange(rng.random_range(100.0..300.0)),
             angular_velocity: attributes::AngularVelocity(rng.random_range(-2.0..2.0)),
-            ..default()
+            dps: attributes::Dps(rng.random_range(2. ..5.)),
+            marker: markers::Enemy,
         });
     }
 }
@@ -77,6 +78,34 @@ pub fn seek_and_follow_player(
 
         if to_player.length_squared() < los_range.0.powi(2) {
             movement.set_direction(to_player);
+        }
+    }
+}
+
+// TODO: Optimise
+// getting a full query for player and enemy doesn't seem right
+// research the thing, and maybe rather try getting the components
+// directly from world with found entity id?
+pub fn hit_and_damage_player(
+    mut collision_events: EventReader<Collision>,
+    mut player_hitpoints: Query<&mut attributes::Hitpoints, With<markers::Player>>,
+    enemy_dps: Query<&attributes::Dps, With<markers::Enemy>>,
+    time: Res<Time>,
+) {
+    for Collision(contact) in collision_events.read() {
+        let entity1 = contact.entity1;
+        let entity2 = contact.entity2;
+
+        if let (Ok(damage), Ok(mut hp)) =
+            (enemy_dps.get(entity1), player_hitpoints.get_mut(entity2))
+        {
+            hp.damage(damage.0 * time.delta_secs());
+            // commands.entity(entity1).try_despawn();
+        } else if let (Ok(damage), Ok(mut hp)) =
+            (enemy_dps.get(entity2), player_hitpoints.get_mut(entity1))
+        {
+            hp.damage(damage.0 * time.delta_secs());
+            // commands.entity(entity2).try_despawn();
         }
     }
 }

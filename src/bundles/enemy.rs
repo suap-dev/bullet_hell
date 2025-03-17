@@ -5,7 +5,7 @@ use crate::{
     components::{attributes, markers},
 };
 
-#[derive(Bundle, Default)]
+#[derive(Bundle)]
 pub struct Enemy<M: Material2d> {
     pub sprite: bundles::ProtoSprite<M>,
     pub body: bundles::Body,
@@ -13,6 +13,7 @@ pub struct Enemy<M: Material2d> {
     pub hitpoints: attributes::Hitpoints,
     pub los_range: attributes::SightRange,
     pub angular_velocity: attributes::AngularVelocity,
+    pub dps: attributes::Dps,
     //
     pub marker: markers::Enemy,
 }

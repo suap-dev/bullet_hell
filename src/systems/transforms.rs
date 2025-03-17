@@ -23,7 +23,6 @@ pub fn apply_angular_velocity(
 }
 
 pub fn teleport_at_borders(
-    // window: Query<&Window>,
     borders: Res<resources::Borders>,
     mut query: Query<(&mut Transform, &attributes::Radius)>,
 ) {

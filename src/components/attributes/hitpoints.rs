@@ -5,6 +5,7 @@ pub struct Hitpoints {
     current: f32,
     max: f32,
 }
+// TODO: create tests for Hitpoints implementation
 impl Hitpoints {
     #[must_use]
     pub fn from_max(max: f32) -> Self {
