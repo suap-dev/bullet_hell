@@ -53,7 +53,7 @@ pub fn spawn(
             hitpoints: attributes::Hitpoints::from_max(rng.random_range(9.0..=40.0)),
             los_range: attributes::SightRange(rng.random_range(100.0..300.0)),
             angular_velocity: attributes::AngularVelocity(rng.random_range(-2.0..2.0)),
-            dps: attributes::Dps(rng.random_range(2. ..5.)),
+            dps: attributes::Dps(rng.random_range(2. ..100.)),
             marker: markers::Enemy,
         });
     }
@@ -70,14 +70,16 @@ pub fn seek_and_follow_player(
     >,
     player_transform: Query<&Transform, With<markers::Player>>,
 ) {
-    let player_position = player_transform.single().translation.xy();
+    if let Ok(player_transform) = player_transform.get_single() {
+        let player_position = player_transform.translation.xy();
 
-    for (mut movement, transform, los_range) in &mut query {
-        let position = transform.translation.xy();
-        let to_player = player_position - position;
+        for (mut movement, transform, los_range) in &mut query {
+            let position = transform.translation.xy();
+            let to_player = player_position - position;
 
-        if to_player.length_squared() < los_range.0.powi(2) {
-            movement.set_direction(to_player);
+            if to_player.length_squared() < los_range.0.powi(2) {
+                movement.set_direction(to_player);
+            }
         }
     }
 }

@@ -27,11 +27,11 @@ impl Movement {
         }
     }
 
-    pub fn set_direction(&mut self, from: Vec2) -> Vec2 {
+    pub fn set_direction(&mut self, from: Vec2) {
         self.direction = from.normalize_or_zero();
-        self.direction
     }
 
+    #[must_use]
     pub fn get_velocity(&self) -> Vec2 {
         self.direction * self.max_speed
     }
