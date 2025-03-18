@@ -61,3 +61,72 @@ impl Hitpoints {
         }
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn from_max_hp() {
+        let hitpoints = Hitpoints::from_max(100.);
+        assert_eq!(hitpoints.current, 100.);
+        assert_eq!(hitpoints.max, 100.);
+    }
+
+    #[test]
+    fn heal() {
+        let mut hitpoints = Hitpoints {
+            current: 0.,
+            max: 100.,
+        };
+
+        hitpoints.heal(10.);
+        assert_eq!(hitpoints.current, 10.);
+        assert_eq!(hitpoints.max, 100.);
+
+        assert_eq!(hitpoints.heal(42.), 42.);
+        assert_eq!(hitpoints.current, 52.);
+        assert_eq!(hitpoints.max, 100.);
+
+        assert_eq!(hitpoints.heal(55.), 48.);
+        assert_eq!(hitpoints.current, 100.);
+        assert_eq!(hitpoints.max, 100.);
+    }
+
+    #[test]
+    fn overheal() {
+        let mut hitpoints = Hitpoints {
+            current: 0.,
+            max: 100.,
+        };
+
+        assert_eq!(hitpoints.heal_with_overheal(42.), 0.);
+        assert_eq!(hitpoints.current, 42.);
+        assert_eq!(hitpoints.max, 100.);
+
+        assert_eq!(hitpoints.heal_with_overheal(42.), 0.);
+        assert_eq!(hitpoints.current, 84.);
+        assert_eq!(hitpoints.max, 100.);
+
+        assert_eq!(hitpoints.heal_with_overheal(42.), 26.);
+        assert_eq!(hitpoints.current, 126.);
+        assert_eq!(hitpoints.max, 100.);
+    }
+
+    #[test]
+    fn damage() {
+        let mut hitpoints = Hitpoints::from_max(100.);
+
+        assert_eq!(hitpoints.damage(42.), 42.);
+        assert_eq!(hitpoints.current, 100. - 42.);
+        assert_eq!(hitpoints.max, 100.);
+
+        assert_eq!(hitpoints.damage(42.), 42.);
+        assert_eq!(hitpoints.current, 100. - 84.);
+        assert_eq!(hitpoints.max, 100.);
+
+        assert_eq!(hitpoints.damage(42.), 16.);
+        assert_eq!(hitpoints.current, 0.);
+        assert_eq!(hitpoints.max, 100.);
+    }
+}
