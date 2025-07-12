@@ -32,6 +32,7 @@ features = [
     "bevy_sprite",
     "bevy_ui",
     "default_font",
+    "wayland", # install libwayland-dev pkg-config
 
     # Optional features:
     # https://docs.rs/bevy/0.15.3/bevy/#optional-features
