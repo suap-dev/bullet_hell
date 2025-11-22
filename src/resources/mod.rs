@@ -1,4 +1,7 @@
-use bevy::{ecs::system::Resource, time::{Timer, TimerMode}};
+use bevy::{
+    ecs::resource::Resource,
+    time::{Timer, TimerMode},
+};
 
 use crate::config;
 
@@ -30,4 +33,3 @@ impl Default for ShootCooldown {
         ))
     }
 }
-

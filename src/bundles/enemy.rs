@@ -1,4 +1,7 @@
-use bevy::{ecs::bundle::Bundle, sprite::Material2d};
+use bevy::{
+    ecs::bundle::Bundle, sprite_render::Material2d,
+    // sprite::Material2d
+};
 
 use crate::{
     bundles,

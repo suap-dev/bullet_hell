@@ -67,7 +67,7 @@ pub fn handle_input(
         direction.y -= 1.;
     }
 
-    if let Ok(mut movement) = player.get_single_mut() {
+    if let Ok(mut movement) = player.single_mut() {
         movement.set_direction(direction);
     }
 }
@@ -76,7 +76,7 @@ pub fn target_closest_enemy(
     mut player: Query<(&Transform, &mut attributes::Target), With<markers::Player>>,
     enemies: Query<&Transform, With<markers::Enemy>>,
 ) {
-    if let Ok((transform, mut nearest_enemy)) = player.get_single_mut() {
+    if let Ok((transform, mut nearest_enemy)) = player.single_mut() {
         let player_position = transform.translation.xy();
 
         let mut distance_squared = f32::MAX;
@@ -110,8 +110,8 @@ pub fn shoot_target(
 ) {
     shoot_cooldown.0.tick(time.delta());
 
-    if shoot_cooldown.0.finished() {
-        if let Ok((&player_transform, &attributes::Target(target_position))) = player.get_single() {
+    if shoot_cooldown.0.is_finished() {
+        if let Ok((&player_transform, &attributes::Target(target_position))) = player.single() {
             let player_position = player_transform.translation.xy();
 
             if player_position.distance_squared(target_position) > 0. {
@@ -146,7 +146,7 @@ pub fn shoot_target(
 pub fn log_hp(
     player: Query<&attributes::Hitpoints, (With<markers::Player>, Changed<attributes::Hitpoints>)>,
 ) {
-    if let Ok(hitpoints) = player.get_single() {
+    if let Ok(hitpoints) = player.single() {
         println!("{}", hitpoints.current());
     }
 }

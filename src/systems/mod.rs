@@ -17,14 +17,14 @@ pub fn death(
 ) {
     let delta = time.delta();
     for (entity, mut lifespan) in &mut with_lifespan {
-        if let Some(mut e) = commands.get_entity(entity) {
-            if lifespan.0.tick(delta).finished() {
+        if let Ok(mut e) = commands.get_entity(entity) {
+            if lifespan.0.tick(delta).is_finished() {
                 e.despawn();
             }
         }
     }
     for (entity, hitpoints) in &with_hitpoints {
-        if let Some(mut e) = commands.get_entity(entity) {
+        if let Ok(mut e) = commands.get_entity(entity) {
             if hitpoints.current() <= 0.0 {
                 e.despawn();
             }

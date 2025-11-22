@@ -10,6 +10,7 @@ use bevy::{
     prelude::*,
 };
 
+
 #[allow(clippy::wildcard_imports)]
 use crate::systems::*;
 
@@ -20,7 +21,7 @@ fn main() {
         .insert_resource(resources::ShootCooldown::default());
 
     game.add_plugins(plugins::GamePlugins)
-        .add_plugins(FrameTimeDiagnosticsPlugin);
+        .add_plugins(FrameTimeDiagnosticsPlugin::default());
 
     game.register_diagnostic(
         Diagnostic::new(FrameTimeDiagnosticsPlugin::FPS).with_smoothing_factor(0.5),

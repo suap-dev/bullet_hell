@@ -15,8 +15,8 @@ impl PluginGroup for GamePlugins {
             .set(WindowPlugin {
                 primary_window: Some(Window {
                     resolution: WindowResolution::new(
-                        config::WINDOW_LOGICAL_WIDTH,
-                        config::WINDOW_LOGICAL_HEIGHT,
+                        config::WINDOW_PHYSICAL_WIDTH,
+                        config::WINDOW_PHYSICAL_HEIGHT,
                     ),
                     resizable: false,
                     enabled_buttons: EnabledButtons {

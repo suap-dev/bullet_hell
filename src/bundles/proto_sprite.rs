@@ -1,7 +1,7 @@
 use bevy::{
     ecs::bundle::Bundle,
-    render::mesh::Mesh2d,
-    sprite::{Material2d, MeshMaterial2d},
+    prelude::Mesh2d,
+    sprite_render::{Material2d, MeshMaterial2d},
 };
 
 #[derive(Bundle, Default)]

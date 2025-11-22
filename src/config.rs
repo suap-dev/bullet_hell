@@ -1,6 +1,9 @@
 pub const WINDOW_LOGICAL_WIDTH: f32 = 800.;
 pub const WINDOW_LOGICAL_HEIGHT: f32 = 600.;
 
+pub const WINDOW_PHYSICAL_WIDTH: u32 = 800;
+pub const WINDOW_PHYSICAL_HEIGHT: u32 = 600;
+
 pub const BORDER_TELEPORT_CORRECTION: f32 = 4.0;
 
 pub const ENEMY_COUNT: usize = 100;

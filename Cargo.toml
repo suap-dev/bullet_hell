@@ -16,23 +16,23 @@ resolver = "2" # Important! wgpu/Bevy needs this!
 rand = "0.9.0"
 
 [dependencies.avian2d]
-version = "0.2.1"
+version = "0.4.1"
 default-features = false
 features = ["2d", "parry-f32", "parallel", "simd"]
 
 [dependencies.bevy]
-version = "0.15.3"
-default-features = false
+version = "0.17.3"
+default-features = true
 features = [
     # Selected default features:
-    # https://docs.rs/bevy/0.15.3/bevy/#default-features
-    "multi_threaded",
-    "bevy_asset",
-    "bevy_winit",
-    "bevy_sprite",
-    "bevy_ui",
-    "default_font",
-    "wayland", # install libwayland-dev pkg-config
+    # https://docs.rs/crate/bevy/latest/features
+    # "multi_threaded",
+    # "bevy_asset",
+    # "bevy_winit",
+    # "bevy_sprite",
+    # "bevy_ui",
+    # "default_font",
+    # "wayland", # install libwayland-dev pkg-config
 
     # Optional features:
     # https://docs.rs/bevy/0.15.3/bevy/#optional-features

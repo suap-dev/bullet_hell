@@ -20,13 +20,13 @@ pub fn spawn(mut commands: Commands) {
             },
             BackgroundColor::from(tailwind::EMERALD_800),
             BorderRadius::all(Val::Px(5.)),
-            BoxShadow {
-                color: Color::from(tailwind::STONE_950),
-                x_offset: Val::Px(4.),
-                y_offset: Val::Px(7.),
-                spread_radius: Val::Px(3.),
-                blur_radius: Val::Px(3.),
-            },
+            BoxShadow::new(
+                Color::from(tailwind::STONE_950),
+                Val::Px(4.),
+                Val::Px(7.),
+                Val::Px(3.),
+                Val::Px(3.),
+            ),
         ))
         .id();
 
@@ -60,7 +60,10 @@ pub fn fps_counter(
 ) {
     if let Some(fps_diagnostic) = diagnostics.get(&FrameTimeDiagnosticsPlugin::FPS) {
         if let Some(fps_val) = fps_diagnostic.smoothed() {
-            **fps_text_query.single_mut() = format!("{fps_val:.0}");
+            if let Ok(mut x) = fps_text_query.single_mut() {
+                **x= format!("{fps_val:.0}");
+            };
+            // **fps_text_query.single_mut() = format!("{fps_val:.0}");
         }
     }
 }
@@ -77,8 +80,8 @@ pub fn player_healthbar(
     >,
     mut hp_bar: Query<&mut Node, With<markers::PlayerHealthbar>>,
 ) {
-    if let Ok(hitpoints) = player_hp.get_single() {
-        if let Ok(mut bar_node) = hp_bar.get_single_mut() {
+    if let Ok(hitpoints) = player_hp.single() {
+        if let Ok(mut bar_node) = hp_bar.single_mut() {
             bar_node.width = Val::Percent(100. * hitpoints.current() / hitpoints.max());
         }
     }

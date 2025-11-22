@@ -1,4 +1,4 @@
-use avian2d::prelude::{Collider, Collision, CollisionLayers, CollisionMargin};
+use avian2d::prelude::{Collider, CollisionLayers, CollisionMargin, CollisionStart};
 use bevy::{math::vec2, prelude::*};
 use rand::Rng;
 use std::f32::consts::TAU;
@@ -70,7 +70,7 @@ pub fn seek_and_follow_player(
     >,
     player_transform: Query<&Transform, With<markers::Player>>,
 ) {
-    if let Ok(player_transform) = player_transform.get_single() {
+    if let Ok(player_transform) = player_transform.single() {
         let player_position = player_transform.translation.xy();
 
         for (mut movement, transform, los_range) in &mut query {
@@ -89,22 +89,27 @@ pub fn seek_and_follow_player(
 // research the thing, and maybe rather try getting the components
 // directly from world with found entity id?
 pub fn hit_and_damage_player(
-    mut collision_events: EventReader<Collision>,
+    mut collision_events: MessageReader<CollisionStart>,
     mut player_hitpoints: Query<&mut attributes::Hitpoints, With<markers::Player>>,
     enemy_dps: Query<&attributes::Dps, With<markers::Enemy>>,
     time: Res<Time>,
 ) {
-    for Collision(contact) in collision_events.read() {
-        let entity1 = contact.entity1;
-        let entity2 = contact.entity2;
+    for CollisionStart {
+        collider1: entity1,
+        collider2: entity2,
+        ..
+    } in collision_events.read()
+    {
+        // let entity1 = contact.entity1;
+        // let entity2 = contact.entity2;
 
         if let (Ok(damage), Ok(mut hp)) =
-            (enemy_dps.get(entity1), player_hitpoints.get_mut(entity2))
+            (enemy_dps.get(*entity1), player_hitpoints.get_mut(*entity2))
         {
             hp.damage(damage.0 * time.delta_secs());
             // commands.entity(entity1).try_despawn();
         } else if let (Ok(damage), Ok(mut hp)) =
-            (enemy_dps.get(entity2), player_hitpoints.get_mut(entity1))
+            (enemy_dps.get(*entity2), player_hitpoints.get_mut(*entity1))
         {
             hp.damage(damage.0 * time.delta_secs());
             // commands.entity(entity2).try_despawn();
