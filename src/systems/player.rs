@@ -110,8 +110,8 @@ pub fn shoot_target(
 ) {
     shoot_cooldown.0.tick(time.delta());
 
-    if shoot_cooldown.0.is_finished() {
-        if let Ok((&player_transform, &attributes::Target(target_position))) = player.single() {
+    if shoot_cooldown.0.is_finished()
+        && let Ok((&player_transform, &attributes::Target(target_position))) = player.single() {
             let player_position = player_transform.translation.xy();
 
             if player_position.distance_squared(target_position) > 0. {
@@ -140,7 +140,6 @@ pub fn shoot_target(
                 });
             }
         }
-    }
 }
 
 pub fn log_hp(

@@ -58,14 +58,13 @@ pub fn fps_counter(
     diagnostics: Res<DiagnosticsStore>,
     mut fps_text_query: Query<&mut Text, With<markers::FpsCounter>>,
 ) {
-    if let Some(fps_diagnostic) = diagnostics.get(&FrameTimeDiagnosticsPlugin::FPS) {
-        if let Some(fps_val) = fps_diagnostic.smoothed() {
-            if let Ok(mut x) = fps_text_query.single_mut() {
-                **x= format!("{fps_val:.0}");
-            };
-            // **fps_text_query.single_mut() = format!("{fps_val:.0}");
-        }
-    }
+    if let Some(fps_diagnostic) = diagnostics.get(&FrameTimeDiagnosticsPlugin::FPS)
+        && let Some(fps_val) = fps_diagnostic.smoothed()
+        && let Ok(mut x) = fps_text_query.single_mut()
+    {
+        **x = format!("{fps_val:.0}");
+    };
+    // **fps_text_query.single_mut() = format!("{fps_val:.0}");
 }
 
 // TODO: consider using events here; will it even be better?
@@ -80,9 +79,9 @@ pub fn player_healthbar(
     >,
     mut hp_bar: Query<&mut Node, With<markers::PlayerHealthbar>>,
 ) {
-    if let Ok(hitpoints) = player_hp.single() {
-        if let Ok(mut bar_node) = hp_bar.single_mut() {
-            bar_node.width = Val::Percent(100. * hitpoints.current() / hitpoints.max());
-        }
+    if let Ok(hitpoints) = player_hp.single()
+        && let Ok(mut bar_node) = hp_bar.single_mut()
+    {
+        bar_node.width = Val::Percent(100. * hitpoints.current() / hitpoints.max());
     }
 }
