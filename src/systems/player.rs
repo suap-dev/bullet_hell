@@ -1,4 +1,4 @@
-use avian2d::prelude::{Collider, CollisionLayers, CollisionMargin};
+use avian2d::prelude::{Collider, CollisionEventsEnabled, CollisionLayers, CollisionMargin};
 use bevy::{math::vec2, prelude::*};
 
 use crate::{
@@ -111,13 +111,15 @@ pub fn shoot_target(
     shoot_cooldown.0.tick(time.delta());
 
     if shoot_cooldown.0.is_finished()
-        && let Ok((&player_transform, &attributes::Target(target_position))) = player.single() {
-            let player_position = player_transform.translation.xy();
+        && let Ok((&player_transform, &attributes::Target(target_position))) = player.single()
+    {
+        let player_position = player_transform.translation.xy();
 
-            if player_position.distance_squared(target_position) > 0. {
-                let radius = 2.;
+        if player_position.distance_squared(target_position) > 0. {
+            let radius = 2.;
 
-                commands.spawn(bundles::Projectile {
+            commands.spawn((
+                bundles::Projectile {
                     damage: attributes::Damage(10.),
                     sprite: bundles::ProtoSprite {
                         mesh: Mesh2d(meshes.add(Circle::new(radius))),
@@ -137,9 +139,14 @@ pub fn shoot_target(
                     movement: attributes::Movement::new(target_position - player_position, 200.),
                     lifespan: attributes::LifeSpan(Timer::from_seconds(1.5, TimerMode::Once)),
                     marker: markers::Projectile,
-                });
-            }
+                },
+                // TODO: consider rebuilding the buddles::Projectile thing
+                // TODO: find out if this is the best place for this CollisionEventsEnabled component
+                // changed while migrating to avian 0.4
+                CollisionEventsEnabled,
+            ));
         }
+    }
 }
 
 pub fn log_hp(
