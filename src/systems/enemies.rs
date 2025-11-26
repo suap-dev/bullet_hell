@@ -1,4 +1,4 @@
-use avian2d::prelude::{Collider, CollisionLayers, CollisionMargin, CollisionStart};
+use avian2d::prelude::*;
 use bevy::{math::vec2, prelude::*};
 use rand::Rng;
 use std::f32::consts::TAU;
@@ -84,35 +84,17 @@ pub fn seek_and_follow_player(
     }
 }
 
-// TODO: Optimise
-// getting a full query for player and enemy doesn't seem right
-// research the thing, and maybe rather try getting the components
-// directly from world with found entity id?
-pub fn hit_and_damage_player(
-    mut collision_events: MessageReader<CollisionStart>,
-    mut player_hitpoints: Query<&mut attributes::Hitpoints, With<markers::Player>>,
+pub fn damage_player(
+    collisions: Collisions,
+    mut player: Query<(Entity, &mut attributes::Hitpoints), With<markers::Player>>,
     enemy_dps: Query<&attributes::Dps, With<markers::Enemy>>,
     time: Res<Time>,
 ) {
-    for CollisionStart {
-        collider1: entity1,
-        collider2: entity2,
-        ..
-    } in collision_events.read()
-    {
-        // let entity1 = contact.entity1;
-        // let entity2 = contact.entity2;
-
-        if let (Ok(damage), Ok(mut hp)) =
-            (enemy_dps.get(*entity1), player_hitpoints.get_mut(*entity2))
-        {
-            hp.damage(damage.0 * time.delta_secs());
-            // commands.entity(entity1).try_despawn();
-        } else if let (Ok(damage), Ok(mut hp)) =
-            (enemy_dps.get(*entity2), player_hitpoints.get_mut(*entity1))
-        {
-            hp.damage(damage.0 * time.delta_secs());
-            // commands.entity(entity2).try_despawn();
+    if let Ok((player_entity, mut player_hp)) = player.single_mut() {
+        for enemy_entity in collisions.entities_colliding_with(player_entity) {
+            if let Ok(dps) = enemy_dps.get(enemy_entity) {
+                player_hp.damage(dps.0 * time.delta_secs());
+            }
         }
     }
 }

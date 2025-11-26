@@ -1,4 +1,4 @@
-use avian2d::prelude::{Collider, CollisionEventsEnabled, CollisionLayers, CollisionMargin};
+use avian2d::prelude::*;
 use bevy::{math::vec2, prelude::*};
 
 use crate::{
@@ -140,10 +140,6 @@ pub fn shoot_target(
                     lifespan: attributes::LifeSpan(Timer::from_seconds(1.5, TimerMode::Once)),
                     marker: markers::Projectile,
                 },
-                // TODO: consider rebuilding the buddles::Projectile thing
-                // TODO: find out if this is the best place for this CollisionEventsEnabled component
-                // changed while migrating to avian 0.4
-                CollisionEventsEnabled,
             ));
         }
     }
