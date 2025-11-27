@@ -5,6 +5,7 @@ use bevy::{
     prelude::*,
     window::{EnabledButtons, WindowResolution},
 };
+use bevy_enhanced_input::EnhancedInputPlugin;
 
 use crate::config;
 
@@ -29,5 +30,6 @@ impl PluginGroup for GamePlugins {
                 ..default()
             })
             .add_group(PhysicsPlugins::default())
+            .add(EnhancedInputPlugin)
     }
 }

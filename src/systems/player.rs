@@ -1,10 +1,13 @@
 use avian2d::prelude::*;
 use bevy::{math::vec2, prelude::*};
+use bevy_enhanced_input::prelude::*;
 
 use crate::{
     bundles,
     components::{attributes, markers},
-    config, resources,
+    config,
+    input::actions,
+    resources,
 };
 
 pub fn spawn(
@@ -27,48 +30,32 @@ pub fn spawn(
         collision_margin: CollisionMargin(radius * config::DEFAULT_COLLISION_MARGIN_RATIO),
     };
 
-    commands.spawn(bundles::Player {
-        sprite,
-        body,
-        movement: attributes::Movement::from_max_speed(80.),
-        nearest_enemy: attributes::Target::default(),
-        marker: markers::Player,
-        hitpoints: attributes::Hitpoints::from_max(100.),
-    });
+    commands.spawn((
+        bundles::Player {
+            sprite,
+            body,
+            movement: attributes::Movement::from_max_speed(80.),
+            nearest_enemy: attributes::Target::default(),
+            hitpoints: attributes::Hitpoints::from_max(100.),
+            //
+            marker: markers::Player,
+        },
+        actions!(
+            markers::Player[(
+                Action::<actions::Movement>::new(),
+                Bindings::spawn(Cardinal::wasd_keys()),
+            )]
+        ),
+    ));
 }
 
-pub fn handle_input(
-    mut player: Query<&mut attributes::Movement, With<markers::Player>>,
-    keyboard_input: Res<ButtonInput<KeyCode>>,
+pub fn movement(
+    action: On<Fire<actions::Movement>>,
+    mut player_transform: Query<&mut attributes::Movement, With<markers::Player>>,
 ) {
-    let mut direction = Vec2::ZERO;
-
-    // TODO: separate module for input mappings?
-    // probably a resource for input collection?
-    let action_up =
-        keyboard_input.pressed(KeyCode::ArrowUp) || keyboard_input.pressed(KeyCode::KeyW);
-    let action_down =
-        keyboard_input.pressed(KeyCode::ArrowDown) || keyboard_input.pressed(KeyCode::KeyS);
-    let action_left =
-        keyboard_input.pressed(KeyCode::ArrowLeft) || keyboard_input.pressed(KeyCode::KeyA);
-    let action_right =
-        keyboard_input.pressed(KeyCode::ArrowRight) || keyboard_input.pressed(KeyCode::KeyD);
-
-    if action_right {
-        direction.x += 1.;
-    }
-    if action_left {
-        direction.x -= 1.;
-    }
-    if action_up {
-        direction.y += 1.;
-    }
-    if action_down {
-        direction.y -= 1.;
-    }
-
-    if let Ok(mut movement) = player.single_mut() {
-        movement.set_direction(direction);
+    if let Ok(mut movement) = player_transform.single_mut() {
+        movement.set_direction(action.value);
+        println!("{}", action.value);
     }
 }
 
@@ -118,29 +105,27 @@ pub fn shoot_target(
         if player_position.distance_squared(target_position) > 0. {
             let radius = 2.;
 
-            commands.spawn((
-                bundles::Projectile {
-                    damage: attributes::Damage(10.),
-                    sprite: bundles::ProtoSprite {
-                        mesh: Mesh2d(meshes.add(Circle::new(radius))),
-                        material: MeshMaterial2d(materials.add(Color::srgb(0.6, 1., 0.))),
-                    },
-                    body: bundles::Body {
-                        transform: Transform::from_translation(
-                            player_transform.translation - Vec3::new(0., 0., 1.),
-                        ),
-                        radius: attributes::Radius(radius),
-                        collider: Collider::circle(radius),
-                        collision_layers: CollisionLayers::new(0b0010, 0b0001),
-                        collision_margin: CollisionMargin(
-                            radius * config::DEFAULT_COLLISION_MARGIN_RATIO,
-                        ),
-                    },
-                    movement: attributes::Movement::new(target_position - player_position, 200.),
-                    lifespan: attributes::LifeSpan(Timer::from_seconds(1.5, TimerMode::Once)),
-                    marker: markers::Projectile,
+            commands.spawn((bundles::Projectile {
+                damage: attributes::Damage(10.),
+                sprite: bundles::ProtoSprite {
+                    mesh: Mesh2d(meshes.add(Circle::new(radius))),
+                    material: MeshMaterial2d(materials.add(Color::srgb(0.6, 1., 0.))),
                 },
-            ));
+                body: bundles::Body {
+                    transform: Transform::from_translation(
+                        player_transform.translation - Vec3::new(0., 0., 1.),
+                    ),
+                    radius: attributes::Radius(radius),
+                    collider: Collider::circle(radius),
+                    collision_layers: CollisionLayers::new(0b0010, 0b0001),
+                    collision_margin: CollisionMargin(
+                        radius * config::DEFAULT_COLLISION_MARGIN_RATIO,
+                    ),
+                },
+                movement: attributes::Movement::new(target_position - player_position, 200.),
+                lifespan: attributes::LifeSpan(Timer::from_seconds(1.5, TimerMode::Once)),
+                marker: markers::Projectile,
+            },));
         }
     }
 }

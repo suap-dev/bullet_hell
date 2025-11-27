@@ -13,7 +13,8 @@ needless_pass_by_value = { level = "allow", priority = 1 }
 resolver = "2" # Important! wgpu/Bevy needs this!
 
 [dependencies]
-rand = "0.9.0"
+rand = "0.9.2"
+bevy_enhanced_input = "0.20.0"
 
 [dependencies.avian2d]
 version = "0.4.1"
@@ -24,8 +25,9 @@ features = ["2d", "parry-f32", "parallel", "simd"]
 version = "0.17.3"
 default-features = true
 features = [
-    # Selected default features:
     # https://docs.rs/crate/bevy/latest/features
+
+    # Selected default features:
     # "multi_threaded",
     # "bevy_asset",
     # "bevy_winit",
@@ -35,7 +37,6 @@ features = [
     # "wayland", # install libwayland-dev pkg-config
 
     # Optional features:
-    # https://docs.rs/bevy/0.15.3/bevy/#optional-features
     "dynamic_linking",
 ]
 
