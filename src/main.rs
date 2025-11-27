@@ -40,6 +40,7 @@ fn main() {
             // player::handle_input,
             player::target_closest_enemy,
             player::shoot_target,
+            player::apply_input,
             // player::report_hp,
             projectiles::damage_enemy,
             enemies::seek_and_follow_player,
@@ -50,8 +51,7 @@ fn main() {
             death,
         ),
     )
-    .add_systems(PostUpdate, (ui::fps_counter, ui::player_healthbar))
-    .add_observer(player::movement);
+    .add_systems(PostUpdate, (ui::fps_counter, ui::player_healthbar));
 
     game.run();
 }

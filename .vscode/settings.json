@@ -1,6 +1,7 @@
 {
     "conventionalCommits.scopes": [
         "ui",
-        "gameplay"
+        "gameplay",
+        "input"
     ]
 }

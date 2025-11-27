@@ -1,5 +1,6 @@
 use bevy::{
-    ecs::bundle::Bundle, sprite_render::Material2d,
+    ecs::bundle::Bundle,
+    sprite_render::Material2d,
     // sprite::Material2d
 };
 

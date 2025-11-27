@@ -49,14 +49,11 @@ pub fn spawn(
     ));
 }
 
-pub fn movement(
-    action: On<Fire<actions::Movement>>,
-    mut player_transform: Query<&mut attributes::Movement, With<markers::Player>>,
+pub fn apply_input(
+    action: Single<&Action<actions::Movement>>,
+    mut velocity: Single<&mut attributes::Movement, With<markers::Player>>,
 ) {
-    if let Ok(mut movement) = player_transform.single_mut() {
-        movement.set_direction(action.value);
-        println!("{}", action.value);
-    }
+    velocity.set_direction(***action);
 }
 
 pub fn target_closest_enemy(
