@@ -28,6 +28,7 @@ pub fn spawn(
                 rng.random_range(0.4..0.8),
             ))),
         };
+
         let transform = Transform::from_xyz(
             rng.random_range(borders.left..borders.right) * 0.95,
             rng.random_range(borders.bottom..borders.top) * 0.95,
