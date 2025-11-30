@@ -1,6 +1,7 @@
 use bevy::{ecs::component::Component, math::Vec2};
 
 // TODO: check if bevy's 'pub struct Direction2d(Vec2)' isn't a better option to do this
+// TODO: remove Movement, use Velocity from Avian2d instead; we want to add RigidBody
 #[derive(Component, Clone, Copy, Default)]
 pub struct Movement {
     direction: Vec2,
