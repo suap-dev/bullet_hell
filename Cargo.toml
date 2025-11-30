@@ -23,11 +23,16 @@ features = [
     # https://docs.rs/bevy/latest/bevy/
     "bevy_core_pipeline",
 
-    "bevy_sprite_render",
-    "bevy_ui",
     "bevy_winit",
 
+    "bevy_sprite",
+    "bevy_sprite_render",
+
+    "bevy_ui",
+    "bevy_ui_render",
+
     "multi_threaded",
+
     "dynamic_linking",
 ]
 
