@@ -4,24 +4,6 @@ use bevy::prelude::*;
 
 use crate::{components::attributes, config, resources};
 
-pub fn apply_velocity(time: Res<Time>, mut query: Query<(&mut Transform, &attributes::Movement)>) {
-    for (mut transform, movement) in &mut query {
-        transform.translation += (movement.get_velocity() * time.delta_secs()).extend(0.0);
-    }
-}
-
-// TODO: this is a temporary animation
-pub fn apply_angular_velocity(
-    time: Res<Time>,
-    mut query: Query<(&mut Transform, &attributes::AngularVelocity)>,
-) {
-    for (mut transform, angular_velocity) in &mut query {
-        transform.rotate(Quat::from_rotation_z(
-            angular_velocity.0 * time.delta_secs(),
-        ));
-    }
-}
-
 pub fn teleport_at_borders(
     borders: Res<resources::Borders>,
     mut query: Query<(&mut Transform, &attributes::Radius)>,

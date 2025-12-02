@@ -1,5 +1,8 @@
 use avian2d::prelude::*;
-use bevy::{math::vec2, prelude::*};
+use bevy::{
+    math::vec2,
+    prelude::*,
+};
 use bevy_enhanced_input::prelude::*;
 
 use crate::{
@@ -28,13 +31,13 @@ pub fn spawn(
         collider: Collider::circle(radius),
         collision_layers: CollisionLayers::from_bits(0b0100, 0b0001),
         collision_margin: CollisionMargin(radius * config::DEFAULT_COLLISION_MARGIN_RATIO),
+        rigid_body: RigidBody::Kinematic,
     };
 
     commands.spawn((
         bundles::Player {
             sprite,
             body,
-            movement: attributes::Movement::from_max_speed(80.),
             nearest_enemy: attributes::Target::default(),
             hitpoints: attributes::Hitpoints::from_max(100.),
             //
@@ -46,14 +49,16 @@ pub fn spawn(
                 Bindings::spawn(Cardinal::wasd_keys()),
             )]
         ),
+        attributes::MaxSpeed(80.0),
     ));
 }
 
 pub fn apply_input(
     action: Single<&Action<actions::Movement>>,
-    mut velocity: Single<&mut attributes::Movement, With<markers::Player>>,
+    velocity: Single<(&attributes::MaxSpeed, &mut LinearVelocity), With<markers::Player>>,
 ) {
-    velocity.set_direction(***action);
+    let (max_speed, mut linear_velocity) = velocity.into_inner();
+    linear_velocity.0 = max_speed.0 * action.normalize_or_zero();
 }
 
 pub fn target_closest_enemy(
@@ -102,27 +107,32 @@ pub fn shoot_target(
         if player_position.distance_squared(target_position) > 0. {
             let radius = 2.;
 
-            commands.spawn((bundles::Projectile {
-                damage: attributes::Damage(10.),
-                sprite: bundles::ProtoSprite {
-                    mesh: Mesh2d(meshes.add(Circle::new(radius))),
-                    material: MeshMaterial2d(materials.add(Color::srgb(0.6, 1., 0.))),
+            commands.spawn((
+                bundles::Projectile {
+                    damage: attributes::Damage(10.),
+                    sprite: bundles::ProtoSprite {
+                        mesh: Mesh2d(meshes.add(Circle::new(radius))),
+                        material: MeshMaterial2d(materials.add(Color::srgb(0.6, 1., 0.))),
+                    },
+                    body: bundles::Body {
+                        transform: Transform::from_translation(
+                            player_transform.translation - Vec3::new(0., 0., 1.),
+                        ),
+                        radius: attributes::Radius(radius),
+                        collider: Collider::circle(radius),
+                        collision_layers: CollisionLayers::new(0b0010, 0b0001),
+                        collision_margin: CollisionMargin(
+                            radius * config::DEFAULT_COLLISION_MARGIN_RATIO,
+                        ),
+                        rigid_body: RigidBody::Kinematic,
+                    },
+                    // movement: attributes::Movement::new(target_position - player_position, 200.),
+                    lifespan: attributes::LifeSpan(Timer::from_seconds(1.5, TimerMode::Once)),
+                    marker: markers::Projectile,
                 },
-                body: bundles::Body {
-                    transform: Transform::from_translation(
-                        player_transform.translation - Vec3::new(0., 0., 1.),
-                    ),
-                    radius: attributes::Radius(radius),
-                    collider: Collider::circle(radius),
-                    collision_layers: CollisionLayers::new(0b0010, 0b0001),
-                    collision_margin: CollisionMargin(
-                        radius * config::DEFAULT_COLLISION_MARGIN_RATIO,
-                    ),
-                },
-                movement: attributes::Movement::new(target_position - player_position, 200.),
-                lifespan: attributes::LifeSpan(Timer::from_seconds(1.5, TimerMode::Once)),
-                marker: markers::Projectile,
-            },));
+                LinearVelocity((target_position - player_position).normalize_or_zero() * 200.0),
+                Sensor,
+            ));
         }
     }
 }

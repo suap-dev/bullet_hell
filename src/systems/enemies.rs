@@ -40,30 +40,31 @@ pub fn spawn(
             transform,
             radius: attributes::Radius(radius),
             collider: Collider::circle(radius),
-            collision_layers: CollisionLayers::new(0b0001, 0b0110),
+            collision_layers: CollisionLayers::new(0b0001, 0b0111),
             collision_margin: CollisionMargin(radius * config::DEFAULT_COLLISION_MARGIN_RATIO),
+            rigid_body: RigidBody::Dynamic,
         };
 
-        commands.spawn(bundles::Enemy {
-            body,
-            sprite,
-            movement: attributes::Movement::from_velocity(vec2(
-                rng.random_range(-20.0..20.0),
-                rng.random_range(-20.0..20.0),
-            )),
-            hitpoints: attributes::Hitpoints::from_max(rng.random_range(9.0..=40.0)),
-            los_range: attributes::SightRange(rng.random_range(100.0..300.0)),
-            angular_velocity: attributes::AngularVelocity(rng.random_range(-2.0..2.0)),
-            dps: attributes::Dps(rng.random_range(2. ..100.)),
-            marker: markers::Enemy,
-        });
+        let random_velocity = vec2(rng.random_range(-20.0..20.0), rng.random_range(-20.0..20.0));
+        commands.spawn((
+            bundles::Enemy {
+                body,
+                sprite,
+                hitpoints: attributes::Hitpoints::from_max(rng.random_range(9.0..=40.0)),
+                los_range: attributes::SightRange(rng.random_range(100.0..300.0)),
+                angular_velocity: attributes::AngularVelocity(rng.random_range(-2.0..2.0)),
+                dps: attributes::Dps(rng.random_range(2. ..100.)),
+                marker: markers::Enemy,
+            },
+            LinearVelocity(random_velocity),
+        ));
     }
 }
 
 pub fn seek_and_follow_player(
     mut query: Query<
         (
-            &mut attributes::Movement,
+            &mut LinearVelocity,
             &Transform,
             &attributes::SightRange,
         ),
@@ -74,12 +75,12 @@ pub fn seek_and_follow_player(
     if let Ok(player_transform) = player_transform.single() {
         let player_position = player_transform.translation.xy();
 
-        for (mut movement, transform, los_range) in &mut query {
+        for (mut linear_velocity, transform, los_range) in &mut query {
             let position = transform.translation.xy();
             let to_player = player_position - position;
 
             if to_player.length_squared() < los_range.0.powi(2) {
-                movement.set_direction(to_player);
+                linear_velocity.0 = to_player.normalize_or_zero() * linear_velocity.0.length();
             }
         }
     }

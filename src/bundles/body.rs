@@ -1,4 +1,4 @@
-use avian2d::prelude::{Collider, CollisionLayers, CollisionMargin};
+use avian2d::prelude::{Collider, CollisionLayers, CollisionMargin, RigidBody};
 use bevy::{ecs::bundle::Bundle, transform::components::Transform};
 
 use crate::components::attributes;
@@ -12,4 +12,5 @@ pub struct Body {
     // TODO: unify collision layers definitions in the project
     pub collision_layers: CollisionLayers,
     pub collision_margin: CollisionMargin,
+    pub rigid_body: RigidBody,
 }

@@ -2,7 +2,7 @@ mod hitpoints;
 mod movement;
 
 pub use hitpoints::Hitpoints;
-pub use movement::Movement;
+pub use movement::MaxSpeed;
 
 use bevy::{ecs::component::Component, math::Vec2, time::Timer};
 
@@ -15,6 +15,7 @@ pub struct Target(pub Vec2);
 #[derive(Component, Default)]
 pub struct AngularVelocity(pub f32);
 
+// TODO: wtf is this. remove it?
 #[derive(Component, Clone, Copy)]
 pub struct Radius(pub f32);
 
